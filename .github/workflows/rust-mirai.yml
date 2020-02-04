@@ -40,33 +40,20 @@ jobs:
         fetch-depth: 50 # this is to make sure we obtain the target base commit
         repository: ${{ github.event.client_payload.owner }}/${{ github.event.client_payload.repo }} # repo of the forked libra/libra
         ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
-    # github base_ref is a lie, we obtain the target base the hard way
-    - name: Obtain base reference
-      if: success()
-      id: obtain_base_ref
-      uses: actions/github-script@0.4.0
-      env:
-        PULL_ID: ${{ github.event.client_payload.pull_id }}
-      with:
-        github-token: ${{secrets.GITHUB_TOKEN}}
-        result-encoding: string
-        script: |
-          const commits = await github.pulls.listCommits({
-            owner: "libra",
-            repo: "libra",
-            pull_number: process.env.PULL_ID,
-          });
-          return commits.data[0].parents[0].sha;
-    # we build the target base first to only run MIRAI on the changes
-    - name: Build target base then checkout PR
+    - name: Build the target to make sure it is clean
       if: success()
       working-directory: ./libra
-      env:
-        SHA: ${{ steps.obtain_base_ref.outputs.result }}
       run: |
         rustup override set `cat ../MIRAI/rust-toolchain`
         rustup component add rustc-dev
-        git checkout $SHA
+    - name: Build target base then checkout PR to only run MIRAI on the changes
+      if: success()
+      working-directory: ./libra
+      env:
+        BASE: ${{ github.event.client_payload.base_ref }}
+      run: |
+        cargo clean
+        git checkout $BASE
         RUSTFLAGS="-Z always_encode_mir" cargo build
         git checkout -
     - name: Run MIRAI on PR
