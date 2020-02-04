@@ -46,6 +46,9 @@ jobs:
       run: |
         rustup override set `cat ../MIRAI/rust-toolchain`
         rustup component add rustc-dev
+        cargo build # twice to get rid of annoying output
+        cargo build -q 2>&1 >/dev/null | tee ../cargo_results
+        ! test -s ../cargo_results
     - name: Build target base then checkout PR to only run MIRAI on the changes
       if: success()
       working-directory: ./libra
@@ -59,7 +62,8 @@ jobs:
     - name: Run MIRAI on PR
       if: success()
       working-directory: ./libra
-      run: RUSTC_WRAPPER=mirai RUSTFLAGS="-Z always_encode_mir" cargo build -q 2>&1 | tee ../mirai_results
+      timeout-minutes: 60
+      run: RUSTC_WRAPPER=mirai RUSTFLAGS="-Z always_encode_mir" cargo build -q 2>&1 >/dev/null | tee ../mirai_results
     - name: Post comment with MIRAI warnings
       if: success()
       uses: actions/github-script@0.4.0
