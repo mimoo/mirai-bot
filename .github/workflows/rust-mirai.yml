@@ -30,6 +30,7 @@ jobs:
       if: success()
       working-directory: ./MIRAI
       run: |
+        set -x
         rustup component add rustc-dev
         RUSTFLAGS='-Clink-arg=-L./binaries -Clink-arg=-lstdc++' cargo install --path ./checker
     - name: Checkout libra
@@ -44,6 +45,7 @@ jobs:
       if: success()
       working-directory: ./libra
       run: |
+        set -x
         rustup override set `cat ../MIRAI/rust-toolchain`
         rustup component add rustc-dev
         cargo build # twice to get rid of annoying output
@@ -55,6 +57,7 @@ jobs:
       env:
         BASE: ${{ github.event.client_payload.base_ref }}
       run: |
+        set -x
         cargo clean
         git checkout $BASE
         RUSTFLAGS="-Z always_encode_mir" cargo build
@@ -79,6 +82,7 @@ jobs:
               return;
             }
             if (data) {
+              console.log("MIRAI found warnings on https://github.com/libra/libra/pull/" + process.env.PULL_ID);
               data = `Hello!
 
           It looks like MIRAI found some warnings:
