@@ -102,4 +102,5 @@ jobs:
           });
     - name: This step will fail if MIRAI warnings were found
       if: success()
-      run: ! test -s mirai_results
+      run: |
+        ! test -s mirai_results
