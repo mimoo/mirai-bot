@@ -67,7 +67,7 @@ jobs:
       working-directory: ./libra
       timeout-minutes: 60
       run: RUSTC_WRAPPER=mirai RUSTFLAGS="-Z always_encode_mir" cargo build -q 2>&1 >/dev/null | tee ../mirai_results
-    - name: Post comment with MIRAI warnings
+    - name: Write comment on PR with MIRAI warnings
       if: success()
       uses: actions/github-script@0.4.0
       env:
@@ -100,3 +100,6 @@ jobs:
               });
             }
           });
+    - name: This step will fail if MIRAI warnings were found
+      if: success()
+      run: ! test -s mirai_results
