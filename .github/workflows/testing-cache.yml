@@ -1,0 +1,37 @@
+name: TestingCache
+
+on:
+  pull_request:
+    types: [opened, reopened, closed]
+
+jobs:
+  get_libra_and_build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout libra
+        uses: actions/checkout@v2
+        with:
+          path: "libra"
+          repository: "libra/libra"
+      - name: Cache cargo registry
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo index
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo build
+        uses: actions/cache@v1
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+      - name: Build the target to make sure it is clean
+        if: success()
+        working-directory: ./libra
+        run: |
+          set -x
+          cargo build
