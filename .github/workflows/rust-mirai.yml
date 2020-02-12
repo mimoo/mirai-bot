@@ -85,7 +85,7 @@ jobs:
                 return;
               }
               // if MIRAI crashed, error but don't comment
-              if (data.includes("panicked")) {
+              if (data.includes("panicked") || data.includes("could not compile")) {
                 throw "MIRAI crashed";
               }
               // construct comment
