@@ -26,7 +26,9 @@ jobs:
     - name: Checkout libra
       uses: actions/checkout@v2
       with:
-        path: 'libra'
+        path: "libra"
+        repository: ${{ github.event.client_payload.owner }}/${{ github.event.client_payload.repo }} # repo of the forked libra/libra
+        ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
     - name: Build move-prover
       working-directory: ./libra/language/move-prover/bytecode-to-boogie
       run: cargo build
