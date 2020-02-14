@@ -27,7 +27,6 @@ jobs:
       uses: actions/checkout@v2
       with:
         path: "libra"
-        fetch-depth: 50 # this is to make sure we obtain the target base commit
         repository: ${{ github.event.client_payload.owner }}/${{ github.event.client_payload.repo }} # repo of the forked libra/libra
         ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
     - name: Build move-prover
