@@ -49,7 +49,7 @@ jobs:
           rustup override set `cat ../MIRAI/rust-toolchain`
           rustup component add rustc-dev
           git checkout $BASE
-          cargo build
+          RUSTFLAGS="-Z always_encode_mir" cargo build
           git checkout -
       - name: Run MIRAI on PR
         if: success()
