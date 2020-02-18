@@ -59,14 +59,14 @@ jobs:
           RUSTC_WRAPPER=mirai RUSTFLAGS="-Z always_encode_mir" cargo build -q 2>&1 >/dev/null | tee ../mirai_results
       - name: Write comment on PR with MIRAI warnings
         if: success()
-        uses: actions/github-script@0.4.0
+        uses: actions/github-script@0.5.0
         env:
           PULL_ID: ${{ github.event.client_payload.pull_id }}
         with:
           github-token: ${{secrets.MIRAI_BOT}}
           script: |
             const fs = require('fs');
-            fs.readFile('mirai_results', 'utf-8', (err, data) => {
+            fs.readFile('mirai_results', 'utf-8', async (err, data) => {
               // if we have an error, throw
               if (err) {
                 console.log("err:", err);
