@@ -92,7 +92,7 @@ jobs:
 
             `;
               // comment
-              github.issues.createComment({
+              await github.issues.createComment({
                 owner: "libra",
                 repo: "libra",
                 issue_number: process.env.PULL_ID,
