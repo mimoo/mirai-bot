@@ -56,6 +56,7 @@ jobs:
         working-directory: ./libra
         timeout-minutes: 60
         run: |
+          set -o pilefail
           RUSTC_WRAPPER=mirai RUSTFLAGS="-Z always_encode_mir" cargo build -q 2>&1 >/dev/null | tee ../mirai_results
       - name: Write comment on PR with MIRAI warnings
         if: success()
