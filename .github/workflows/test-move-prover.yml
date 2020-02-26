@@ -18,10 +18,12 @@ jobs:
         ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
     - name: Detect the changes in move-prover
       working-directory: ./libra
+      env:
+        BASE: ${{ github.event.client_payload.base_ref }}
       run: |
         git fetch origin
-        git diff --name-only origin/master
-        git diff --name-only origin/master | grep "language/move-prover"
+        git diff --name-only $BASE
+        git diff --name-only $BASE | grep "language/move-prover"
     - name: Install Z3
       uses: pavpanchekha/setup-z3@v1.2
       with:
