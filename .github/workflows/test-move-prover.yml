@@ -43,7 +43,7 @@ jobs:
         echo "::set-env name=Z3_EXE::`which z3`"
     - name: Test move-prover
       working-directory: ./libra/language/move-prover/bytecode-to-boogie
-      timeout-minutes: 30 # normally, expected to be done within 10 mins.
+      timeout-minutes: 1 # normally, expected to be done within 10 mins.
       run: |
         set -o pipefail
         cargo test 2>&1 | tee cargo_test.log
@@ -63,12 +63,15 @@ jobs:
               throw "No changes under `language/move-prover` were found.";
               return;
             }
-            if (data) {
-              lines = data.split('\n');
-              data = lines.slice(lines.findIndex(line => line.includes('Running'))).join('\n');
-              data = "[move-prover] `cargo test` failed with the following error message: \n```" + data + "```";    
-              console.log(data);
+            if (!data) {
+              return;
             }
+            console.log("Move Prover test failed on https://github.com/libra/libra/pull/" + process.env.PULL_ID);
+
+            lines = data.split('\n');
+            data = lines.slice(lines.findIndex(line => line.includes('Running'))).join('\n');
+            data = "[move-prover] `cargo test` for Move Prover (`language/move-prover/bytecode-to-boogie`) failed with the following error message: \n```\n" + data + "\n```";    
+            
             await github.issues.createComment({
                 owner: "libra",
                 repo: "libra",
