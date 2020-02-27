@@ -68,6 +68,8 @@ jobs:
             }
             console.log("Move Prover test failed on https://github.com/libra/libra/pull/" + process.env.PULL_ID);
 
+            console.log("(" + data + ")");
+
             if (data == '') {
               data = '[move-prover] `cargo test` for Move Prover was canceled because it exceeded the time limit (i.e., 30 mins).';
             }
