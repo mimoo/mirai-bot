@@ -68,10 +68,15 @@ jobs:
             }
             console.log("Move Prover test failed on https://github.com/libra/libra/pull/" + process.env.PULL_ID);
 
-            lines = data.split('\n');
-            data = lines.slice(lines.findIndex(line => line.includes('Running'))).join('\n');
-            data = "[move-prover] `cargo test` for Move Prover (`language/move-prover/bytecode-to-boogie`) failed with the following error message: \n```\n" + data + "\n```";    
-            
+            if (data == '') {
+              data = '[move-prover] `cargo test` for Move Prover was canceled because it exceeded the time limit (i.e., 30 mins).';
+            }
+            else
+            {
+              lines = data.split('\n');
+              data = lines.slice(lines.findIndex(line => line.includes('Running'))).join('\n');
+              data = "[move-prover] `cargo test` for Move Prover (`language/move-prover/bytecode-to-boogie`) failed with the following error message: \n```\n" + data + "\n```";    
+            }
             await github.issues.createComment({
                 owner: "libra",
                 repo: "libra",
