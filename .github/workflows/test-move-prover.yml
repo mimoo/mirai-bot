@@ -29,7 +29,7 @@ jobs:
         else
           echo "::set-env name=RUN_TEST::no"
         fi
-    
+
     - name: Install Z3
       if: env.RUN_TEST == 'yes'
       uses: pavpanchekha/setup-z3@v1.2
@@ -70,7 +70,7 @@ jobs:
           echo "::set-env name=TEST_RESULT::fail"
           exit $err
         fi
-      
+
       - name: Post the error message as a comment
       if: env.RUN_TEST == 'yes' && failure()
       uses: actions/github-script@0.6.0
