@@ -110,9 +110,14 @@ jobs:
             console.log(process.env.COMMENTING);
             console.log(env.BOOGIE_EXE);
             console.log(env.Z3_EXE);
+
+            console.log(`https://github.com/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}`);
             throw "Move Prover test failed.";
           })
 
+
+
+        # GITHUB_WORKFLOW_URL=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
 
         # if(process.env.COMMENTING == 'yes') {
         #   await github.issues.createComment({
