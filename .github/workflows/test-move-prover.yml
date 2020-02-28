@@ -88,7 +88,7 @@ jobs:
             `on commit [$(process.env.ref.substring(0,7))](https://github.com/libra/libra/commit/${process.env.ref}) `,
             `did ${process.env.TEST_RESULT}. See [details](`,
             `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}?check_suite_focus=true#step:7:1`,
-            ').';
+            ').'
           );
           console.log(msg);
 
