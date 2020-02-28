@@ -74,11 +74,10 @@ jobs:
 
     - name: Post the error message as a comment
       if: env.RUN_TEST == 'yes' && failure()
-      env:
-        ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
       uses: actions/github-script@0.6.0
       env:
         PULL_ID: ${{ github.event.client_payload.pull_id }}
+        ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
       with:
         github-token: ${{secrets.MIRAI_BOT}}
         script: |
