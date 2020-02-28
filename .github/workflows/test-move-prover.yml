@@ -60,7 +60,7 @@ jobs:
       working-directory: ./libra/language/move-prover/bytecode-to-boogie
       timeout-minutes: 20 # normally, expected to be done within 10 mins.
       run: |
-        echo "::set-env name=TEST_RESULT::timeout"
+        echo "::set-env name=TEST_RESULT::timeout (> 20 mins)"
         set -o pipefail
         if (cargo test 2>&1 | tee cargo_test.log)
         then
@@ -82,19 +82,14 @@ jobs:
         ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
         script: |
           console.log(`Test ${process.env.TEST_RESULT} occured on https://github.com/libra/libra/pull/${process.env.PULL_ID}`);
-          console.log(`https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`);
           console.log(`https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}?check_suite_focus=true#step:7:1`);
-
-          msg = '[move-prover] Move Prover test (`language/move-prover/bytecode-to-boogie/cargo test`) on commit [$(process.env.ref.substring(0,7))](https://github.com/libra/libra/commit/${process.env.ref}) ';
-          if (process.env.TEST_RESULT == 'timeout') {
-            msg = msg + 'timed out.';
-          }
-          if (process.env.TEST_RESULT == 'fail') {
-            msg = msg + 'failed.';
-          }
-          link = `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}?check_suite_focus=true#step:7:1`;
-          msg = msg + `See [details](${link}).`;
-
+          msg = "".concat(
+            '[move-prover] Move Prover test (`language/move-prover/bytecode-to-boogie/cargo test`) ',
+            `on commit [$(process.env.ref.substring(0,7))](https://github.com/libra/libra/commit/${process.env.ref}) `,
+            `did ${process.env.TEST_RESULT}. See [details](`,
+            `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}?check_suite_focus=true#step:7:1`,
+            ').';
+          );
           console.log(msg);
 
         # github.issues.createComment({
