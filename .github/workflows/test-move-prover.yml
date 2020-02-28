@@ -14,6 +14,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         path: "libra"
+        fetch-depth: 50 # this is to make sure we obtain the target base commit
         repository: ${{ github.event.client_payload.owner }}/${{ github.event.client_payload.repo }} # repo of the forked libra/libra
         ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
     
@@ -23,12 +24,12 @@ jobs:
         BASE: ${{ github.event.client_payload.base_ref }}
       run: |
         git diff --name-only $BASE
-      # if (git diff --name-only $BASE | grep "language/move-prover")
-      # then
-      #   echo "::set-env name=RUN_TEST::yes"
-      # else
-      #   echo "::set-env name=RUN_TEST::no"
-      # fi
+        if (git diff --name-only $BASE | grep "language/move-prover")
+        then
+          echo "::set-env name=RUN_TEST::yes"
+        else
+          echo "::set-env name=RUN_TEST::no"
+        fi
 
     - name: Install Z3
       if: env.RUN_TEST == 'yes'
