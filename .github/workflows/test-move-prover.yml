@@ -11,9 +11,9 @@ jobs:
   
     steps:
     - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
     - name: Dump job context
       env:
         JOB_CONTEXT: ${{ toJson(job) }}
@@ -108,6 +108,8 @@ jobs:
             console.log('Message to send: \n' + data);
 
             console.log(process.env.COMMENTING);
+            console.log(env.BOOGIE_EXE);
+            console.log(env.Z3_EXE);
             throw "Move Prover test failed.";
           })
 
