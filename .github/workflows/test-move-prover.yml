@@ -85,16 +85,19 @@ jobs:
           msg = "".concat(
             '[move-prover] Move Prover test (`language/move-prover/bytecode-to-boogie/cargo test`) ',
             `on commit [${process.env.ref.substring(0,7)}](https://github.com/libra/libra/commit/${process.env.ref}) `,
-            `did ${process.env.TEST_RESULT}. See [details](`,
+            `did **${process.env.TEST_RESULT}**. See [details](`,
             `https://github.com/${process.env.GITHUB_REPOSITORY}/runs/${process.env.GITHUB_RUN_ID}?check_suite_focus=true#step:7:1`,
             ').'
           );
+          console.log('GITHUB_RUN_ID: ' + process.env.GITHUB_RUN_ID);
+          console.log('GITHUB_RUN_NUMBER: ' + process.env.GITHUB_RUN_NUMBER);
+
           console.log(msg);
           github.issues.createComment({
               owner: "libra",
               repo: "libra",
               issue_number: process.env.PULL_ID,
-              body: data
+              body: msg
             });
 
         # const fs = require('fs');
