@@ -71,7 +71,7 @@ jobs:
           exit $err
         fi
 
-      - name: Post the error message as a comment
+    - name: Post the error message as a comment
       if: env.RUN_TEST == 'yes' && failure()
       uses: actions/github-script@0.6.0
       env:
