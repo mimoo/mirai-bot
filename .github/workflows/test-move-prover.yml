@@ -74,30 +74,29 @@ jobs:
 
     - name: Post the error message as a comment
       if: env.RUN_TEST == 'yes' && failure()
+      env:
+        ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
       uses: actions/github-script@0.6.0
       env:
         PULL_ID: ${{ github.event.client_payload.pull_id }}
       with:
         github-token: ${{secrets.MIRAI_BOT}}
-        ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
         script: |
           console.log(`Test ${process.env.TEST_RESULT} occured on https://github.com/libra/libra/pull/${process.env.PULL_ID}`);
-          console.log(`https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}?check_suite_focus=true#step:7:1`);
           msg = "".concat(
             '[move-prover] Move Prover test (`language/move-prover/bytecode-to-boogie/cargo test`) ',
-            `on commit [$(process.env.ref.substring(0,7))](https://github.com/libra/libra/commit/${process.env.ref}) `,
+            `on commit [${process.env.ref.substring(0,7)}](https://github.com/libra/libra/commit/${process.env.ref}) `,
             `did ${process.env.TEST_RESULT}. See [details](`,
-            `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}?check_suite_focus=true#step:7:1`,
+            `https://github.com/${process.env.GITHUB_REPOSITORY}/runs/${process.env.GITHUB_RUN_ID}?check_suite_focus=true#step:7:1`,
             ').'
           );
           console.log(msg);
-
-        # github.issues.createComment({
-        #     owner: "libra",
-        #     repo: "libra",
-        #     issue_number: process.env.PULL_ID,
-        #     body: data
-        #   });
+          github.issues.createComment({
+              owner: "libra",
+              repo: "libra",
+              issue_number: process.env.PULL_ID,
+              body: data
+            });
 
         # const fs = require('fs');
         # fs.readFile('libra/language/move-prover/bytecode-to-boogie/cargo_test.log', 'utf-8', async (err, data) => {
