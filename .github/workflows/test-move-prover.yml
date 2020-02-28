@@ -10,7 +10,35 @@ jobs:
     runs-on: ubuntu-18.04
   
     steps:
+    - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+    - name: Dump job context
+      env:
+        JOB_CONTEXT: ${{ toJson(job) }}
+      run: echo "$JOB_CONTEXT"
+    - name: Dump steps context
+      env:
+        STEPS_CONTEXT: ${{ toJson(steps) }}
+      run: echo "$STEPS_CONTEXT"
+    - name: Dump runner context
+      env:
+        RUNNER_CONTEXT: ${{ toJson(runner) }}
+      run: echo "$RUNNER_CONTEXT"
+    - name: Dump strategy context
+      env:
+        STRATEGY_CONTEXT: ${{ toJson(strategy) }}
+      run: echo "$STRATEGY_CONTEXT"
+    - name: Dump matrix context
+      env:
+        MATRIX_CONTEXT: ${{ toJson(matrix) }}
+      run: echo "$MATRIX_CONTEXT"
+
     - name: Checkout libra
+      env:
+        HELLO: WORLD
+        HI: ${{ 'THERE' }}
       uses: actions/checkout@v2
       with:
         path: "libra"
@@ -20,8 +48,11 @@ jobs:
       working-directory: ./libra
       env:
         BASE: ${{ github.event.client_payload.base_ref }}
+        REF: ${{ env.HELLO }}
       run: |
-        git fetch origin
+        echo $HELLO
+        echo $REF
+        echo $HI
         git diff --name-only $BASE
         git diff --name-only $BASE | grep "language/move-prover"
     - name: Install Z3
@@ -53,6 +84,7 @@ jobs:
       uses: actions/github-script@0.5.0
       env:
         PULL_ID: ${{ github.event.client_payload.pull_id }}
+        COMMENTING: ${{ 'no' }}
       with:
         github-token: ${{secrets.MIRAI_BOT}}
         script: |
@@ -73,11 +105,19 @@ jobs:
             data = lines.slice(lines.findIndex(line => line.includes('Running'))).join('\n');
             data = "[move-prover] `cargo test` for Move Prover (`language/move-prover/bytecode-to-boogie`) failed with the following error message: \n```\n" + data + "\n```";    
 
-            await github.issues.createComment({
-                owner: "libra",
-                repo: "libra",
-                issue_number: process.env.PULL_ID,
-                body: data
-              });
-              throw "Move Prover test failed.";
+            console.log('Message to send: \n' + data);
+
+            console.log(process.env.COMMENTING);
+            throw "Move Prover test failed.";
           })
+
+
+        # if(process.env.COMMENTING == 'yes') {
+        #   await github.issues.createComment({
+        #       owner: "libra",
+        #       repo: "libra",
+        #       issue_number: process.env.PULL_ID,
+        #       body: data
+        #     });
+        #   }
+        # }
