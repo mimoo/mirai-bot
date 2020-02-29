@@ -95,7 +95,7 @@ jobs:
               });
               for await (const line of mirai_output) {
                 // get the relative filename of the warning
-                var absolute_path = path.resolve(__dirname, "libra")
+                var absolute_path = path.resolve(process.cwd(), "libra")
                 var warning = JSON.parse(line);
                 var touched_absolute = warning.target.src_path;
                 var touched = path.relative(absolute_path, touched_absolute);
