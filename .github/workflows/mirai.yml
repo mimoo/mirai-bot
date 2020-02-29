@@ -97,6 +97,7 @@ jobs:
                 // get the relative filename of the warning
                 var absolute_path = path.resolve(process.cwd(), "libra")
                 var warning = JSON.parse(line);
+                console.log("parsed warning:", warning);
                 var touched_absolute = warning.target.src_path;
                 var touched = path.relative(absolute_path, touched_absolute);
 
