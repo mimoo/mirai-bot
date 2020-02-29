@@ -98,17 +98,25 @@ jobs:
                 var absolute_path = path.resolve(process.cwd(), "libra")
                 var warning = JSON.parse(line);
                 console.log("parsed warning:", warning);
+                if (!"target" in warning || !"src_path" in warning.target) {
+                  console.log("ignoring warning");
+                  continue;
+                }
                 var touched_absolute = warning.target.src_path;
                 var touched = path.relative(absolute_path, touched_absolute);
 
                 // see if it matched one of the files changed
                 if (files_changed.includes(touched)) {
+                  console.log("valid warning found!");
                   valid_warnings.push(warning);
+                } else {
+                  console.log("not a valid warning");
                 }
               }
 
               // no warnings
               if (valid_warnings.length == 0) {
+                console.log("no valid warnings detected");
                 return;
               }
 
