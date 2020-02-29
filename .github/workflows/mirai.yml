@@ -1,4 +1,4 @@
-name: Rust_MIRAI
+name: MIRAI
 
 # Why `on: repository_dispatch`?
 #
