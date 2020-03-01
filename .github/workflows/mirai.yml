@@ -17,6 +17,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Who triggered this?
+        env:
+          PULL_ID: ${{ github.event.client_payload.pull_id }}
+        run: |
+          echo "action triggerd by https://github.com/libra/libra/pull/$PULL_ID"
       - name: Install Z3
         uses: pavpanchekha/setup-z3@v1.2
       - name: Checkout MIRAI
