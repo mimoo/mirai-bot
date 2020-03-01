@@ -81,13 +81,13 @@ jobs:
             var path = require('path');
 
             function valid_warning(warning) {
-              if (!"target" in warning || !"message" in warning) {
+              if (!warning.hasOwnProperty("target") || !warning.hasOwnProperty("message")) {
                 return false;
               }
-              if (!"src_path" in warning.target) {
+              if (!warning.target.hasOwnProperty("src_path")) {
                 return false;
               }
-              if (!"rendered" in warning.message) {
+              if (!warning.message.hasOwnProperty("rendered")) {
                 return false;
               }
               return true;
