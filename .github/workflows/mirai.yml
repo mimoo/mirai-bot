@@ -98,8 +98,12 @@ jobs:
                 var absolute_path = path.resolve(process.cwd(), "libra")
                 var warning = JSON.parse(line);
                 console.log("parsed warning:", warning);
-                if (!"target" in warning || !"src_path" in warning.target) {
-                  console.log("ignoring warning");
+                if (!"target" in warning) {
+                  console.log("ignoring warning: no target");
+                  continue;
+                }
+                if (!"src_path" in warning.target) {
+                  console.log("ignoring warning: no src_path");
                   continue;
                 }
                 var touched_absolute = warning.target.src_path;
