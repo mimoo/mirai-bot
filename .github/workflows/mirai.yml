@@ -117,9 +117,8 @@ jobs:
                 // get the relative filename of the warning
                 var absolute_path = path.resolve(process.cwd(), "libra")
                 var warning = JSON.parse(line);
-                console.log("parsed warning:", warning);
                 if(!valid_warning(warning)) {
-                  console.log("ignoring warning");
+                  console.log("ignoring compiler artifact");
                   continue;
                 }
                 var touched_absolute = warning.target.src_path;
@@ -127,10 +126,10 @@ jobs:
 
                 // see if it matched one of the files changed
                 if (files_changed.includes(touched)) {
-                  console.log("valid warning found!");
+                  console.log("valid warning found:", warning);
                   valid_warnings.push(warning);
                 } else {
-                  console.log("not a valid warning");
+                  console.log("not a valid warning:", warning);
                 }
               }
 
