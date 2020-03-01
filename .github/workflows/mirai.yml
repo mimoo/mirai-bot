@@ -75,6 +75,19 @@ jobs:
             const readline = require('readline');
             var path = require('path');
 
+            function valid_warning(warning) {
+              if (!"target" in warning || !"message" in warning) {
+                return false;
+              }
+              if (!"src_path" in warning.target) {
+                return false;
+              }
+              if (!"rendered" in warning.message) {
+                return false;
+              }
+              return true;
+            }
+
             async function process_warnings() {
               // get all the files that have changed
               const files_changed_reader = readline.createInterface({
@@ -98,12 +111,8 @@ jobs:
                 var absolute_path = path.resolve(process.cwd(), "libra")
                 var warning = JSON.parse(line);
                 console.log("parsed warning:", warning);
-                if (!"target" in warning) {
-                  console.log("ignoring warning: no target");
-                  continue;
-                }
-                if (!"src_path" in warning.target) {
-                  console.log("ignoring warning: no src_path");
+                if(!valid_warning(warning)) {
+                  console.log("ignoring warning");
                   continue;
                 }
                 var touched_absolute = warning.target.src_path;
@@ -127,11 +136,7 @@ jobs:
               // create the message
               var message = "";
               for (warning of valid_warnings) {
-                if ("message" in warning) {
-                  message += warning.message.rendered;
-                } else {
-                  message += warning;
-                }
+                message += warning.message.rendered;
               }
               var message = `Hello you!
 
