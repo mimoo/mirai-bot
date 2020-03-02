@@ -69,6 +69,7 @@ jobs:
         else
           err=$?
           echo "::set-env name=TEST_RESULT::fail"
+          echo "::set-env JOB_INS_ID=`curl -s https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID | egrep '/[0-9]{9}\?' -o | egrep '[0-9]{9}' -o`"
           exit $err
         fi
 
@@ -82,16 +83,20 @@ jobs:
         github-token: ${{secrets.MIRAI_BOT}}
         script: |
           console.log(`Test ${process.env.TEST_RESULT} occured on https://github.com/libra/libra/pull/${process.env.PULL_ID}`);
-          link_to_run=`https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`; // TODO: improve this to be more specific
+          
+          if ('JOB_INS_ID' in process.env && process.env.JOB_INS_ID.length == 9) {
+            link_to_log=`https://github.com/${process.env.GITHUB_REPOSITORY}/runs/${process.env.JOB_INS_ID}?check_suite_focus=true#step:7:1`;
+          }
+          else {
+            link_to_log=`https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`; 
+          }
           msg = "".concat(
             '[move-prover] Move Prover test (`language/move-prover/bytecode-to-boogie/cargo test`) ',
             `on commit [${process.env.ref.substring(0,7)}](https://github.com/libra/libra/commit/${process.env.ref}) `,
             `did **${process.env.TEST_RESULT}**. See [details](`,
-            link_to_run,
+            link_to_log,
             ').'
           );
-          //console.log('GITHUB_RUN_ID: ' + process.env.GITHUB_RUN_ID);
-          //console.log('GITHUB_RUN_NUMBER: ' + process.env.GITHUB_RUN_NUMBER);
 
           console.log(msg);
           github.issues.createComment({
