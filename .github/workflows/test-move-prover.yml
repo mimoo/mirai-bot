@@ -53,6 +53,8 @@ jobs:
       run: |
         echo "::set-env name=BOOGIE_EXE::/home/runner/.dotnet/tools/boogie"
         echo "::set-env name=Z3_EXE::`which z3`"
+        echo "::set-env name=JOB_INS_ID::`curl -s https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID | egrep '/[0-9]{9}\?' -o | egrep '[0-9]{9}' -o`"
+
     
     - name: Test move-prover
       if: env.RUN_TEST == 'yes'
@@ -69,7 +71,6 @@ jobs:
         else
           err=$?
           echo "::set-env name=TEST_RESULT::fail"
-          echo "::set-env JOB_INS_ID=`curl -s https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID | egrep '/[0-9]{9}\?' -o | egrep '[0-9]{9}' -o`"
           exit $err
         fi
 
@@ -84,7 +85,7 @@ jobs:
         script: |
           console.log(`Test ${process.env.TEST_RESULT} occured on https://github.com/libra/libra/pull/${process.env.PULL_ID}`);
           
-          if ('JOB_INS_ID' in process.env && process.env.JOB_INS_ID.length == 9) {
+          if (process.env.JOB_INS_ID.length == 9) {
             link_to_log=`https://github.com/${process.env.GITHUB_REPOSITORY}/runs/${process.env.JOB_INS_ID}?check_suite_focus=true#step:7:1`;
           }
           else {
