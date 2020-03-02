@@ -128,8 +128,6 @@ jobs:
                 if (files_changed.includes(touched)) {
                   console.log("valid warning found:", warning);
                   valid_warnings.push(warning);
-                } else {
-                  console.log("not a valid warning:", warning);
                 }
               }
 
@@ -155,15 +153,12 @@ jobs:
             `;
 
               // comment
-              /*
               await github.issues.createComment({
                 owner: "libra",
                 repo: "libra",
                 issue_number: process.env.PULL_ID,
                 body: data
               });
-              */
-
               console.log(message);
 
               // warn devs
