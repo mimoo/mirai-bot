@@ -57,13 +57,12 @@ jobs:
           # we should always be able to build $BASE
           RUSTFLAGS="-Z always_encode_mir" cargo build
           git checkout -
-      - name: Run MIRAI on PR
+      - name: Run MIRAI on PR (this step can fail if cargo can't build the PR)
         if: success()
         working-directory: ./libra
         timeout-minutes: 60
         run: |
           set -o pipefail
-          # this step can fail if cargo can't build the PR`
           RUSTC_WRAPPER=mirai RUSTFLAGS="-Z always_encode_mir" cargo build --message-format=json -q 2>/dev/null | tee ../mirai_results
       - name: Get files that were changed
         if: success()
