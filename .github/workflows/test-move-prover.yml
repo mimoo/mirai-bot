@@ -53,6 +53,7 @@ jobs:
       run: |
         echo "::set-env name=BOOGIE_EXE::/home/runner/.dotnet/tools/boogie"
         echo "::set-env name=Z3_EXE::`which z3`"
+        echo "::set-env name=JOB_INS_ID::`curl -s https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID | egrep '/[0-9]{9}\?' -o | egrep '[0-9]{9}' -o`"
     
     - name: Test move-prover
       if: env.RUN_TEST == 'yes'
@@ -60,7 +61,6 @@ jobs:
       working-directory: ./libra/language/move-prover/bytecode-to-boogie
       timeout-minutes: 20 # normally, expected to be done within 10 mins.
       run: |
-        echo "::set-env name=TEST_RESULT::timeout (> 20 mins)"
         set -o pipefail
         if (cargo test 2>&1 | tee cargo_test.log)
         then
@@ -81,17 +81,22 @@ jobs:
       with:
         github-token: ${{secrets.MIRAI_BOT}}
         script: |
-          console.log(`Test ${process.env.TEST_RESULT} occured on https://github.com/libra/libra/pull/${process.env.PULL_ID}`);
-          link_to_run=`https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`; // TODO: improve this to be more specific
+          test_result = (process.env.TEST_RESULT == undefined) ? 'timeout (> 20 mins)' : process.env.TEST_RESULT;
+          console.log(`Test ${test_result} occured on https://github.com/libra/libra/pull/${process.env.PULL_ID}`);
+          
+          if (process.env.JOB_INS_ID.length == 9) {
+            link_to_log=`https://github.com/${process.env.GITHUB_REPOSITORY}/runs/${process.env.JOB_INS_ID}?check_suite_focus=true#step:7:1`;
+          }
+          else {
+            link_to_log=`https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`; 
+          }
           msg = "".concat(
             '[move-prover] Move Prover test (`language/move-prover/bytecode-to-boogie/cargo test`) ',
             `on commit [${process.env.ref.substring(0,7)}](https://github.com/libra/libra/commit/${process.env.ref}) `,
-            `did **${process.env.TEST_RESULT}**. See [details](`,
-            link_to_run,
+            `did **${test_result}**. See [details](`,
+            link_to_log,
             ').'
           );
-          //console.log('GITHUB_RUN_ID: ' + process.env.GITHUB_RUN_ID);
-          //console.log('GITHUB_RUN_NUMBER: ' + process.env.GITHUB_RUN_NUMBER);
 
           console.log(msg);
           github.issues.createComment({
