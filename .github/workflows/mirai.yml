@@ -145,11 +145,27 @@ jobs:
 
             It looks like MIRAI found some warnings:
 
-            \`\`\`
-            ${message}
-            \`\`\`
+            <details><summary>click here to reveal them</summary>
+            <pre><code>${message}</code></pre>
+            </details>
 
             `;
+
+              // delete previous comments
+              const comments = await github.pulls.listComments({
+                owner: "libra",
+                repo: "libra",
+                pull_number: process.env.PULL_ID
+              });
+              for (let comment of comments.data) {
+                if (comment.user.login === "mirai-bot") {
+                  await github.pulls.deleteComment({
+                    owner: "libra",
+                    repo: "libra",
+                    comment_id: comment.id
+                  });
+                }
+              }
 
               // comment
               await github.issues.createComment({
