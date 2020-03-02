@@ -59,7 +59,7 @@ jobs:
       if: env.RUN_TEST == 'yes'
       id: test_move_prover
       working-directory: ./libra/language/move-prover/bytecode-to-boogie
-      timeout-minutes: 1 # normally, expected to be done within 10 mins.
+      timeout-minutes: 20 # normally, expected to be done within 10 mins.
       run: |
         set -o pipefail
         if (cargo test 2>&1 | tee cargo_test.log)
