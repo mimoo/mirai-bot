@@ -64,6 +64,10 @@ jobs:
         run: |
           set -o pipefail
           RUSTC_WRAPPER=mirai RUSTFLAGS="-Z always_encode_mir" cargo build --message-format=json -q | tee ../mirai_results
+      - name: Only run this is build failed (to debug)
+        if: failure()
+        run: |
+          RUSTC_WRAPPER=mirai RUSTFLAGS="-Z always_encode_mir" cargo build --message-format=json
       - name: Get files that were changed
         if: success()
         working-directory: ./libra
