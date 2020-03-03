@@ -117,16 +117,19 @@ jobs:
                 var absolute_path = path.resolve(process.cwd(), "libra")
                 var warning = JSON.parse(line);
                 if(!valid_warning(warning)) {
-                  console.log("ignoring compiler artifact");
                   continue;
                 }
+
+                // see if it matched one of the files changed
+                console.log("warning found:", warning);
                 var touched_absolute = warning.target.src_path;
                 var touched = path.relative(absolute_path, touched_absolute);
 
-                // see if it matched one of the files changed
                 if (files_changed.includes(touched)) {
-                  console.log("valid warning found:", warning);
+                  console.log(":) warning related to files changed!");
                   valid_warnings.push(warning);
+                } else {
+                  console.log(":( warning not related to files changed");
                 }
               }
 
