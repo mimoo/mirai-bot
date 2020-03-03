@@ -68,7 +68,7 @@ jobs:
         if: failure()
         working-directory: ./libra
         run: |
-          RUSTC_WRAPPER=mirai RUSTFLAGS="-Z always_encode_mir" cargo build --message-format=json
+          RUSTC_WRAPPER=mirai RUSTFLAGS="-Z always_encode_mir" cargo build
       - name: Get files that were changed
         if: success()
         working-directory: ./libra
