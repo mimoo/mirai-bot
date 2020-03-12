@@ -58,7 +58,7 @@ jobs:
     - name: Test move-prover
       if: env.RUN_TEST == 'yes'
       id: test_move_prover
-      working-directory: ./libra/language/move-prover/bytecode-to-boogie
+      working-directory: ./libra/language/move-prover
       timeout-minutes: 20 # normally, expected to be done within 10 mins.
       run: |
         set -o pipefail
@@ -91,7 +91,7 @@ jobs:
             link_to_log=`https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`; 
           }
           msg = "".concat(
-            '[move-prover] Move Prover test (`language/move-prover/bytecode-to-boogie/cargo test`) ',
+            '[move-prover] Move Prover test (`language/move-prover/cargo test`) ',
             `on commit [${process.env.ref.substring(0,7)}](https://github.com/libra/libra/commit/${process.env.ref}) `,
             `did **${test_result}**. See [details](`,
             link_to_log,
@@ -107,7 +107,7 @@ jobs:
             });
 
         # const fs = require('fs');
-        # fs.readFile('libra/language/move-prover/bytecode-to-boogie/cargo_test.log', 'utf-8', async (err, data) => {
+        # fs.readFile('libra/language/move-prover/cargo_test.log', 'utf-8', async (err, data) => {
         #   if (err) {
         #     console.log("err:", err);
         #     console.log("`cargo test` has not launched. Perhaps, it was skipped because no changes under `language/move-prover` were found.");
