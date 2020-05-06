@@ -83,7 +83,7 @@ jobs:
       with:
         github-token: ${{secrets.MIRAI_BOT}}
         script: |
-          test_result = (process.env.TEST_RESULT == undefined) ? 'timeout (> 20 mins)' : process.env.TEST_RESULT;
+          test_result = (process.env.TEST_RESULT == undefined) ? 'timeout (> 30 mins)' : process.env.TEST_RESULT;
           console.log(`Test ${test_result} occured on https://github.com/libra/libra/pull/${process.env.PULL_ID}`);
           
           if (process.env.JOB_INS_ID.length == 9) {
