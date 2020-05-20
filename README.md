@@ -4,7 +4,7 @@ MIRAI bot is essentially a repository that gets triggered when a new PR gets sub
 
 This allows us to perform github actions on libra without having admin access to the repo.
 
-![mirai bot](mirai-bot.pngs)
+![mirai bot](mirai-bot.png)
 
 ## MIRAI
 
