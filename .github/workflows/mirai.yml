@@ -81,6 +81,7 @@ jobs:
         uses: actions/github-script@0.5.0
         env:
           PULL_ID: ${{ github.event.client_payload.pull_id }}
+          OWNER: ${{ github.event.client_payload.owner }}
         with:
           github-token: ${{secrets.MIRAI_BOT}}
           script: |
@@ -127,8 +128,17 @@ jobs:
                   continue;
                 }
 
-                // see if it matched one of the files changed
+                // valid warning found
                 console.log("warning found:", warning);
+
+                // if the PR owner is whitelisted, all warnings are included
+                if( ["mimoo", "phlip9"].includes(process.env.OWNER) ) {
+                  console.log("owner of PR is whitelisted, all warnings are included");
+                  valid_warnings.push(warning);
+                  continue;
+                }
+
+                // see if it matched one of the files changed
                 var touched_absolute = warning.target.src_path;
                 var touched = path.relative(absolute_path, touched_absolute);
 
