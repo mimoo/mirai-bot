@@ -1,4 +1,4 @@
-name: Run_Move_Coverage
+name: Move_Coverage
 
 on:
   repository_dispatch:
@@ -6,7 +6,6 @@ on:
 
 jobs:
   run_Move_coverage:
-
     runs-on: ubuntu-18.04
 
     steps:
