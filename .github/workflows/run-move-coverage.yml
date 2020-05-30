@@ -41,11 +41,16 @@ jobs:
       if: env.RUN_TEST == 'yes'
       id: collect_move_coverage
       working-directory: ./libra/language/tools/move-coverage
+      env:
+        BASE: ${{ github.event.client_payload.base_ref }}
       timeout-minutes: 50 # normally, expected to be done within 10 mins.
       run: |
         set -o pipefail
          rustup component add rustfmt
         ./gather_stats.bash $LOG_PATH $BASELINE_PATH
+         git checkout $BASE
+         rm -rf $MOVE_VM_TRACE
+        ./gather_stats.bash $BASELINE_PATH $BASELINE_PATH
         err=$?
         if [ $err -e 0 ]
         then
@@ -100,11 +105,11 @@ jobs:
           You can get more details [here](${link_to_log})
                   `;
                   console.log(message);
-                  github.issues.createComment({
-                      owner: "libra",
-                      repo: "libra",
-                      issue_number: process.env.PULL_ID,
-                      body: message,
-                    });
+                  //github.issues.createComment({
+                  //    owner: "libra",
+                  //    repo: "libra",
+                  //    issue_number: process.env.PULL_ID,
+                  //    body: message,
+                  //  });
               });
           });
