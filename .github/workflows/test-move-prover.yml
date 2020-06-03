@@ -101,12 +101,15 @@ jobs:
           );
 
           console.log(msg);
-          github.issues.createComment({
+          
+          // TODO: Uncomment the following line to resume posting the error messages as comments:
+          /*github.issues.createComment({
               owner: "libra",
               repo: "libra",
               issue_number: process.env.PULL_ID,
               body: msg
-            });
+            });*/
+
 
         # const fs = require('fs');
         # fs.readFile('libra/language/move-prover/cargo_test.log', 'utf-8', async (err, data) => {
