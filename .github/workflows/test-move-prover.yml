@@ -26,8 +26,8 @@ jobs:
       run: |
         echo Test requested by https://github.com/libra/libra/pull/$PULL_ID
         git diff --name-only $BASE
-        if (git diff --name-only $BASE | grep "language/move-prover\|language/move-lang/src\|language/stdlib\|language/bytecode-verifier/src\|language/vm/src")
-        #if (git diff --name-only $BASE | grep "language/move-prover")
+        #if (git diff --name-only $BASE | grep "language/move-prover\|language/move-lang/src\|language/stdlib\|language/bytecode-verifier/src\|language/vm/src")
+        if (git diff --name-only $BASE | grep "language/move-prover")
         then
           echo "::set-env name=RUN_TEST::yes"
         else
@@ -38,7 +38,7 @@ jobs:
       if: env.RUN_TEST == 'yes'
       uses: pavpanchekha/setup-z3@v1.2
       with:
-        version: "4.8.7"
+        version: "4.8.8"
     
     - name: Install .NET Core SDK and Boogie
       if: env.RUN_TEST == 'yes'
@@ -49,7 +49,7 @@ jobs:
         sudo apt-get install apt-transport-https
         sudo apt-get update
         sudo apt-get install dotnet-sdk-3.1
-        dotnet tool install --global Boogie --version 2.5.7
+        dotnet tool install --global Boogie --version 2.6.17
     
     - name: Export the environment variables
       if: env.RUN_TEST == 'yes'
