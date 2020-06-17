@@ -36,6 +36,7 @@ jobs:
           set -x
           rustup component add rustc-dev
           rustup component add rustfmt
+          rustup component add llvm-tools-preview
           RUSTFLAGS='-Clink-arg=-L./binaries -Clink-arg=-lstdc++' cargo install --path ./checker
       - name: Checkout libra
         if: success()
@@ -55,7 +56,6 @@ jobs:
           rustup override set `cat ../MIRAI/rust-toolchain`
           rustup component add rustc-dev
           rustup component add rustfmt
-          rustup component add llvm-tools-preview
           git checkout $BASE
           # we should always be able to build $BASE
           RUSTFLAGS="-Z always_encode_mir" cargo build
