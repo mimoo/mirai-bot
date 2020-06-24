@@ -42,7 +42,6 @@ jobs:
 
     - name: Install Z3
       if: env.RUN_TEST == 'yes'
-      working-directory: /home/runner/z3
       run: |
         which curl
         which wget
@@ -51,7 +50,6 @@ jobs:
         which bsdtar
         pwd
         ls
-        echo "::set-env name=RUN_TEST::no"
 
     - name: Install .NET Core SDK and Boogie
       if: env.RUN_TEST == 'yes'
