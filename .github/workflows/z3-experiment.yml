@@ -50,8 +50,8 @@ jobs:
         which tar
         pwd
         ls
-        curl -LO https://github.com/wrwg/z3/releases/download/Libra/z3-4.8.9-x64-osx-10.14.6.zip
-        echo "::set-env name=RUN_TEST::no"
+        #curl -LO https://github.com/wrwg/z3/releases/download/Libra/z3-4.8.9-x64-osx-10.14.6.zip
+        #echo "::set-env name=RUN_TEST::no"
 
     - name: Install .NET Core SDK and Boogie
       if: env.RUN_TEST == 'yes'
