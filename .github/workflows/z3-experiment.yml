@@ -43,8 +43,8 @@ jobs:
     - name: Install Z3
       if: env.RUN_TEST == 'yes'
       run: |
-        mkdir -p /home/runner/z3_bin
-        cd /home/runner/z3_bin
+        mkdir -p /home/runner/z3
+        cd /home/runner/z3
         curl -LO https://github.com/wrwg/z3/releases/download/Libra/z3-4.8.9-x64-osx-10.14.6.zip
         unzip -j *
         pwd
