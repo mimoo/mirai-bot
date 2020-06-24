@@ -47,7 +47,6 @@ jobs:
         which wget
         which unzip
         which tar
-        which bsdtar
         pwd
         ls
 
