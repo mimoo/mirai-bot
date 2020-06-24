@@ -26,8 +26,8 @@ jobs:
       run: |
         echo Test requested by https://github.com/libra/libra/pull/$PULL_ID
         git diff --name-only $BASE
-        #if (git diff --name-only $BASE | grep "language/move-prover\|language/move-lang/src\|language/stdlib\|language/bytecode-verifier/src\|language/vm/src")
-        if (git diff --name-only $BASE | grep "language/move-prover")
+        if (git diff --name-only $BASE | grep "language/move-prover\|language/move-lang/src\|language/stdlib\|language/bytecode-verifier/src\|language/vm/src")
+        #if (git diff --name-only $BASE | grep "language/move-prover")
         then
           echo "::set-env name=RUN_TEST::yes"
         else
@@ -36,9 +36,14 @@ jobs:
 
     - name: Install Z3
       if: env.RUN_TEST == 'yes'
-      uses: pavpanchekha/setup-z3@v1.2
-      with:
-        version: "4.8.8"
+      run: |
+        mkdir -p /home/runner/z3
+        cd /home/runner/z3
+        curl -LO https://github.com/wrwg/z3/releases/download/Libra/z3-4.8.9-x64-ubuntu-16.04.zip
+        unzip -j *
+        pwd
+        ls
+        ./z3 --version
     
     - name: Install .NET Core SDK and Boogie
       if: env.RUN_TEST == 'yes'
@@ -55,7 +60,7 @@ jobs:
       if: env.RUN_TEST == 'yes'
       run: |
         echo "::set-env name=BOOGIE_EXE::/home/runner/.dotnet/tools/boogie"
-        echo "::set-env name=Z3_EXE::`which z3`"
+        echo "::set-env name=Z3_EXE::/home/runner/z3/z3"
         echo "::set-env name=JOB_INS_ID::`curl -s https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID | egrep '/[0-9]{9}\?' -o | egrep '[0-9]{9}' -o`"
     
     - name: Test move-prover
