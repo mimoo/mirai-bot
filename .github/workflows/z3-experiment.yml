@@ -45,7 +45,7 @@ jobs:
       run: |
         mkdir -p /home/runner/z3
         cd /home/runner/z3
-        curl -LO https://github.com/wrwg/z3/releases/download/Libra/z3-4.8.9-x64-osx-10.14.6.zip
+        curl -LO https://github.com/wrwg/z3/releases/download/Libra/z3-4.8.9-x64-ubuntu-16.04.zip
         unzip -j *
         pwd
         ls
