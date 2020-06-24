@@ -49,6 +49,7 @@ jobs:
         unzip -j *
         pwd
         ls
+        ./z3 --version
 
     - name: Install .NET Core SDK and Boogie
       if: env.RUN_TEST == 'yes'
