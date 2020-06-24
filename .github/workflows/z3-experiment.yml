@@ -1,4 +1,4 @@
-name: Test_Move_Prover
+name: Z3_Experiment
 
 on:
   repository_dispatch:
@@ -44,9 +44,12 @@ jobs:
       if: env.RUN_TEST == 'yes'
       working-directory: /home/runner/z3
       run: |
-        wget https://github.com/wrwg/z3/releases/download/Libra/z3-4.8.9-x64-osx-10.14.6.zip
-        unzip -j *
-        ./z3 --version
+        which curl
+        which wget
+        which unzip
+        which tar
+        which bsdtar
+        pwd
         ls
         echo "::set-env name=RUN_TEST::no"
 
