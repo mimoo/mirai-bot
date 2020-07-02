@@ -133,7 +133,7 @@ jobs:
                 console.log("warning found:", warning);
 
                 // if the PR owner is whitelisted, all warnings are included
-                if( ["mimoo", "phlip9", "huitseeker"].includes(process.env.OWNER) ) {
+                if( ["mimoo", "phlip9", "huitseeker", "stonebuddha"].includes(process.env.OWNER) ) {
                   console.log("owner of PR is whitelisted, all warnings are included");
                   valid_warnings.push(warning);
                   continue;
