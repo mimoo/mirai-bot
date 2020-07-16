@@ -70,7 +70,7 @@ jobs:
       timeout-minutes: 30 # normally, expected to be done within 10 mins.
       run: |
         set -o pipefail
-        if (cargo test 2>&1 | tee cargo_test.log)
+        if (cargo test --release 2>&1 | tee cargo_test.log)
         then
           echo "::set-env name=TEST_RESULT::pass"
           exit 0
