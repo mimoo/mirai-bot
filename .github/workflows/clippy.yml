@@ -40,7 +40,7 @@ jobs:
           rustup component add clippy
           git checkout $BASE
           # we should always be able to build $BASE
-          cargo clippy -q -- -W clippy::all | tee ../before_PR
+          cargo xclippy -q -- -W clippy::all | tee ../before_PR
           git checkout -
       - name: Run Clippy on PR (this step can fail if cargo can't build the PR)
         if: success()
@@ -48,7 +48,7 @@ jobs:
         timeout-minutes: 60
         run: |
           set -o pipefail
-          cargo clippy -q -- -W clippy::all | tee ../after_PR
+          cargo xclippy -q -- -W clippy::all | tee ../after_PR
       - name: Get diff
         if: success()
         working-directory: ./libra
