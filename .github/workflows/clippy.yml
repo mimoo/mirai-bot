@@ -1,0 +1,56 @@
+name: clippy
+
+# Why `on: repository_dispatch`?
+#
+# If we trigger this action on pull_request events,
+# then it will run with the forked repo GITHUB_TOKEN
+# this is a problem as it won't allow the action to write
+# a comment on the PR in the last step.
+#
+# instead, we trigger this remotely via a bot we're running ourselves.
+on:
+  repository_dispatch:
+    types: [new_PR]
+
+jobs:
+  install_and_run_MIRAI:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Who triggered this?
+        env:
+          PULL_ID: ${{ github.event.client_payload.pull_id }}
+        run: |
+          echo "action triggerd by https://github.com/libra/libra/pull/$PULL_ID"
+      - name: Checkout libra
+        if: success()
+        uses: actions/checkout@v2
+        with:
+          path: "libra"
+          fetch-depth: 50 # this is to make sure we obtain the target base commit
+          repository: ${{ github.event.client_payload.owner }}/${{ github.event.client_payload.repo }} # repo of the forked libra/libra
+          ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
+      - name: Build target base then checkout PR to only run Clippy on the changes
+        if: success()
+        working-directory: ./libra
+        env:
+          BASE: ${{ github.event.client_payload.base_ref }}
+        run: |
+          set -x
+          rustup component add clippy
+          git checkout $BASE
+          # we should always be able to build $BASE
+          cargo clippy -q -- -W clippy::all | tee ../before_PR
+          git checkout -
+      - name: Run Clippy on PR (this step can fail if cargo can't build the PR)
+        if: success()
+        working-directory: ./libra
+        timeout-minutes: 60
+        run: |
+          set -o pipefail
+          cargo clippy -q -- -W clippy::all | tee ../after_PR
+      - name: Get diff
+        if: success()
+        working-directory: ./libra
+        run: |
+          diff -u before_PR after_PR | sed -n '/^+[^+]/ s/^+//p' | tee ../changes
