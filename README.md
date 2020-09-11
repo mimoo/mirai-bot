@@ -10,6 +10,10 @@ This allows us to perform github actions on libra without having admin access to
 
 Initially the MIRAI bot was in support of running the [MIRAI static analyzer](https://github.com/facebookexperimental/MIRAI) (hence the name).
 
+## Clippy
+
+This runs [all the clippy rules](https://rust-lang.github.io/rust-clippy/master/) on a PR.
+
 ## Move-prover
 
 TKTK
