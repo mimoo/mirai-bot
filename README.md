@@ -12,7 +12,7 @@ Initially the MIRAI bot was in support of running the [MIRAI static analyzer](ht
 
 ## Clippy
 
-This runs [all the clippy rules](https://rust-lang.github.io/rust-clippy/master/) on a PR.
+This runs [all the clippy rules](https://rust-lang.github.io/rust-clippy/master/) on a PR (last updated to reflect all rules of clippy v0.0.212, it is missing panic_in_fn_result).
 
 ## Move-prover
 
