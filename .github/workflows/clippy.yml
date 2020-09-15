@@ -48,6 +48,7 @@ jobs:
           set -x
 
           # update rust and get clippy
+          rustup install nightly
           rustup update
           rustup component add clippy
 
