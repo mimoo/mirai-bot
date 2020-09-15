@@ -23,6 +23,18 @@ jobs:
         run: |
           echo "action triggerd by https://github.com/libra/libra/pull/$PULL_ID"
 
+      - name: don't run this for users who don't want it
+        env:
+          OWNER: ${{ github.event.client_payload.owner }}
+        run: |
+          python << END
+          import os
+          import sys
+          nope = []
+          if os.environ['OWNER'] in nope:
+            sys.exit(1)
+          END
+
       - name: Checkout the PR
         if: success()
         uses: actions/checkout@v2
@@ -57,7 +69,6 @@ jobs:
 
       - name: Get lints only for the relevant files
         if: success()
-        working-directory: ./libra
         run: |
           python << END
 
@@ -65,7 +76,7 @@ jobs:
           # Create list of files + line numbers
           #
           import re
-          relevant_files = open("../files_changed", "r") # git diff -U0 output
+          relevant_files = open("files_changed", "r") # git diff -U0 output
           file_names = []
 
           for line in relevant_files.readlines():
@@ -94,12 +105,12 @@ jobs:
           # Find relevant clippy results
           #
           import json
-          clippy_output = open('../clippy_result', 'r')
+          clippy_output = open("clippy_result", 'r')
 
           # lint hit a file that was changed
-          lint_found = open("../lint_found", "w")
+          lint_found = open("lint_found", "w")
           # lint hit a file and a line number that was added
-          lint_lines_found = open("../lint_lines_found", "w")
+          lint_lines_found = open("lint_lines_found", "w")
 
           for file_name in file_names:
             # find that file in cargo clippy output
@@ -129,12 +140,79 @@ jobs:
 
       - name: Display lint for file
         if: success()
-        working-directory: ./libra
         run: |
-          cat ../lint_found
+          cat lint_found
 
       - name: Display lint for file + lines
         if: success()
-        working-directory: ./libra
         run: |
-          cat ../lint_lines_found
+          cat lint_lines_found
+
+      - name: Write comment on PR if lints are found
+        if: success()
+        uses: actions/github-script@0.5.0
+        env:
+          PULL_ID: ${{ github.event.client_payload.pull_id }}
+          OWNER: ${{ github.event.client_payload.owner }}
+        with:
+          github-token: ${{secrets.MIRAI_BOT}}
+          script: |
+            const fs = require('fs');
+            var path = require('path');
+
+            async function main() {
+              // get lints 
+              var lint_found = fs.readFileSync('lint_found');
+              var lint_lines_found = fs.readFileSync('lint_lines_found');
+
+              // don't post anything if relevant files are not hit
+              if (lint_lines_found === "") {
+                return;
+              }
+
+              // create the message
+              var message = `Hello you!
+
+            It looks like Clippy found some allowed lints that might be useful to you:
+
+            <details><summary>click here to reveal them</summary>
+            <pre><code>${lint_lines_found}</code></pre>
+            </details>
+
+            If you do not like these messages, ask @mimoo to remove you!
+            `;
+
+              // delete previous comments
+              // this will delete other bots message, so remove this for now
+              /*
+              const comments = await github.pulls.listComments({
+                owner: "libra",
+                repo: "libra",
+                pull_number: process.env.PULL_ID
+              });
+              for (let comment of comments.data) {
+                if (comment.user.login === "mirai-bot") {
+                  await github.pulls.deleteComment({
+                    owner: "libra",
+                    repo: "libra",
+                    comment_id: comment.id
+                  });
+                }
+              }
+              */
+
+              // comment
+              await github.issues.createComment({
+                owner: "libra",
+                repo: "libra",
+                issue_number: process.env.PULL_ID,
+                body: data
+              });
+              console.log(message);
+
+              // warn devs
+              console.log("Clippy found warnings on https://github.com/libra/libra/pull/" + process.env.PULL_ID);
+              throw "Clippy warnings were found!";
+            }
+
+            main();
