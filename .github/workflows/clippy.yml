@@ -112,7 +112,7 @@ jobs:
             -W clippy::get_unwrap \
             -W clippy::if_not_else \
             -W clippy::implicit_hasher \
-            -W clippy::implicit_return \
+            -A clippy::implicit_return \
             -W clippy::implicit_saturating_sub \
             -W clippy::imprecise_flops \
             -W clippy::indexing_slicing \
