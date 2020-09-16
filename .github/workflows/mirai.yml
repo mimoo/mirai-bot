@@ -193,7 +193,7 @@ jobs:
                 owner: "libra",
                 repo: "libra",
                 issue_number: process.env.PULL_ID,
-                body: data
+                body: message
               });
               console.log(message);
 
