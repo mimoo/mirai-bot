@@ -260,7 +260,9 @@ jobs:
                       message = obj["message"]["rendered"]
                       lint_found.write(message)
 
-                      for lines in file_name[lines]:
+                      print("trying to find a line hit for ", span["file_name"], span["line_start"], span["line_end"])
+                      for lines in file_name["lines"]:
+                        print("checking", lines)
                         # we found a line that was modified
                         if span["line_start"] >= lines[0] and span["line_end"] <= lines[1]:
                           print("lines hit for", span["file_name"])
