@@ -316,7 +316,7 @@ jobs:
             <pre><code>${lint_lines_found}</code></pre>
             </details>
 
-            If you do not like these messages, ask @mimoo to remove you!
+            If you do not like these messages, or think some of these lints should be disabled, tell @mimoo!
             `;
 
               // delete previous comments
@@ -339,14 +339,12 @@ jobs:
               */
 
               // comment
-              /*
               await github.issues.createComment({
                 owner: "libra",
                 repo: "libra",
                 issue_number: process.env.PULL_ID,
                 body: message
               });
-              */
               console.log(message);
 
               // warn devs
