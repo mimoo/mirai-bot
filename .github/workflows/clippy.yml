@@ -202,12 +202,14 @@ jobs:
               */
 
               // comment
+              /*
               await github.issues.createComment({
                 owner: "libra",
                 repo: "libra",
                 issue_number: process.env.PULL_ID,
                 body: message
               });
+              */
               console.log(message);
 
               // warn devs
