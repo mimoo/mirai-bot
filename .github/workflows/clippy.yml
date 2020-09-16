@@ -162,11 +162,11 @@ jobs:
 
             async function main() {
               // get lints 
-              var lint_found = fs.readFileSync('lint_found');
-              var lint_lines_found = fs.readFileSync('lint_lines_found');
+              const lint_found = fs.readFileSync('lint_found');
+              const lint_lines_found = fs.readFileSync('lint_lines_found');
 
               // don't post anything if relevant files are not hit
-              if (lint_lines_found === "") {
+              if (lint_lines_found.length < 5) { // empty hack
                 return;
               }
 
