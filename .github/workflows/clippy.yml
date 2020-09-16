@@ -85,7 +85,6 @@ jobs:
             # get file name
             if line.startswith("diff --git a/"):
               file_name = re.search('a/(.*) b/', line).group(1)
-              print(file_name)
               file_names.append({"name": file_name.strip(), "lines": []})
 
             # get new code's lines number
@@ -97,10 +96,10 @@ jobs:
                 line_end = line_start
               else:
                 line_end = line_start + int(line_end[1:])
-              print("lines:", line_start, line_end)
               # add these lines to last file_name added
               file_names[-1]["lines"].append([line_start, line_end])
 
+          print(file_names)
           #
           # Find relevant clippy results
           #
@@ -122,13 +121,12 @@ jobs:
                     # we found a file that was modified
                     if span["file_name"] == file_name["name"]:
                       message = obj["message"]["rendered"]
-                      print(message)
                       lint_found.write(message)
 
                       for lines in file_name[lines]:
                         # we found a line that was modified
                         if span["line_start"] >= lines[0] and span["line_end"] <= lines[1]:
-                          print("lines hit!")
+                          print("lines hit for", span["file_name"])
                           lint_lines_found.write(message)
                           break
               except:
