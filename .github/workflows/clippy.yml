@@ -141,7 +141,7 @@ jobs:
             -W clippy::missing_const_for_fn \
             -W clippy::missing_docs_in_private_items \
             -W clippy::missing_errors_doc \
-            -W clippy::missing_inline_in_public_items \
+            -A clippy::missing_inline_in_public_items \
             -W clippy::module_name_repetitions \
             -W clippy::modulo_arithmetic \
             -W clippy::multiple_crate_versions \
@@ -339,12 +339,14 @@ jobs:
               */
 
               // comment
+              /*
               await github.issues.createComment({
                 owner: "libra",
                 repo: "libra",
                 issue_number: process.env.PULL_ID,
                 body: message
               });
+              */
               console.log(message);
 
               // warn devs
