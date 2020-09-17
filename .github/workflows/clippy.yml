@@ -31,6 +31,7 @@ jobs:
           import os
           import sys
           nope = ["mimoo"]
+          print("owner is", os.environ['OWNER'])
           if os.environ['OWNER'] not in nope:
             sys.exit(1)
           END
