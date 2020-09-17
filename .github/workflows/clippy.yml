@@ -30,8 +30,8 @@ jobs:
           python << END
           import os
           import sys
-          nope = []
-          if os.environ['OWNER'] in nope:
+          nope = ["mimoo"]
+          if os.environ['OWNER'] not in nope:
             sys.exit(1)
           END
 
@@ -65,7 +65,7 @@ jobs:
           rustup component add clippy --toolchain nightly
 
           # run clippy with rules
-          cargo +nightly clippy --quiet --message-format=json-diagnostic-rendered-ansi --workspace -- \
+          cargo +nightly clippy --quiet --message-format=json --workspace -- \
             -W clippy::all \
             -W clippy::pedantic \
             -W clippy::nursery \
@@ -339,14 +339,12 @@ jobs:
               */
 
               // comment
-              /*
               await github.issues.createComment({
                 owner: "libra",
                 repo: "libra",
                 issue_number: process.env.PULL_ID,
                 body: message
               });
-              */
               console.log(message);
 
               // warn devs
