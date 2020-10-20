@@ -342,7 +342,7 @@ jobs:
                 pull_number: process.env.PULL_ID
               });
               for (let comment of comments.data) {
-                if (comment.user.login === "mirai-bot" && comment.body.includes("#clippy")) {
+                if (comment.user.login === "MIRAI-bot" && comment.body.includes("#clippy")) {
                   await github.pulls.deleteComment({
                     owner: "libra",
                     repo: "libra",
