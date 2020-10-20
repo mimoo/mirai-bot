@@ -34,7 +34,7 @@ jobs:
             var path = require('path');
 
             async function main() {
-              // get comments on PR
+              // get info on PR
               const pullrequest = await github.pulls.get({
                 owner: "libra",
                 repo: "libra",
