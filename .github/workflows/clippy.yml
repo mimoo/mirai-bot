@@ -326,25 +326,21 @@ jobs:
               // create the message
               var message = `Hello you!
 
-            It looks like Clippy found some allowed lints that might be useful to you:
+            It looks like #clippy found some allowed lints that might be useful to you:
 
             <details><summary>click here to reveal them</summary>
             <pre><code>${lint_lines_found}</code></pre>
             </details>
-
-            If you do not like these messages, or think some of these lints should be disabled, tell @mimoo!
             `;
 
-              // delete previous comments
-              // this will delete other bots message, so remove this for now
-              /*
+              // delete previous comments from MIRAI-BOT that includes the tag "#clippy"
               const comments = await github.pulls.listComments({
                 owner: "libra",
                 repo: "libra",
                 pull_number: process.env.PULL_ID
               });
               for (let comment of comments.data) {
-                if (comment.user.login === "mirai-bot") {
+                if (comment.user.login === "mirai-bot" && comment.body.includes("#clippy")) {
                   await github.pulls.deleteComment({
                     owner: "libra",
                     repo: "libra",
@@ -352,7 +348,6 @@ jobs:
                   });
                 }
               }
-              */
 
               // comment
               await github.issues.createComment({
