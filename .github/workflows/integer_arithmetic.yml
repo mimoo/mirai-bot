@@ -1,0 +1,234 @@
+name: integer_arithmetic
+
+# Why `on: repository_dispatch`?
+#
+# If we trigger this action on pull_request events,
+# then it will run with the forked repo GITHUB_TOKEN
+# this is a problem as it won't allow the action to write
+# a comment on the PR in the last step.
+#
+# instead, we trigger this remotely via a bot we're running ourselves.
+on:
+  repository_dispatch:
+    types: [new_PR]
+
+jobs:
+  run_integer_arithmetic:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Who triggered this?
+        env:
+          PULL_ID: ${{ github.event.client_payload.pull_id }}
+        run: |
+          echo "action triggerd by https://github.com/libra/libra/pull/$PULL_ID"
+
+      - name: Whitelist of users
+        uses: actions/github-script@0.5.0
+        env:
+          PULL_ID: ${{ github.event.client_payload.pull_id }}
+        with:
+          github-token: ${{secrets.MIRAI_BOT}}
+          script: |
+            const fs = require('fs');
+            var path = require('path');
+
+            async function main() {
+              // get info on PR
+              const pullrequest = await github.pulls.get({
+                owner: "libra",
+                repo: "libra",
+                pull_number: process.env.PULL_ID
+              });
+
+              // allowlist
+              /*
+              var allowlist = ["mimoo"];
+              if (!allowlist.includes(pullrequest.data.user.login)) {
+                console.log(pullrequest.user.login + " is not in the allowlist of this github action");
+                throw "Clippy warnings were found!";
+              }
+              */
+            }
+
+            main();
+
+      - name: Checkout the PR
+        if: success()
+        uses: actions/checkout@v2
+        with:
+          path: "libra"
+          fetch-depth: 50 # this is to make sure we obtain the target base commit
+          repository: ${{ github.event.client_payload.owner }}/${{ github.event.client_payload.repo }} # repo of the forked libra/libra
+          ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
+
+      - name: Get files that were changed
+        if: success()
+        working-directory: ./libra
+        env:
+          BASE: ${{ github.event.client_payload.base_ref }}
+        run: |
+          git diff -U0 $BASE | tee ../files_changed
+
+      - name: run Clippy
+        if: success()
+        working-directory: ./libra
+        timeout-minutes: 60
+        run: |
+          set -x
+
+          # update rust and get clippy
+          rustup install nightly
+          rustup update
+          rustup component add clippy --toolchain nightly
+
+          # run clippy with rules
+          cargo +nightly clippy --quiet --message-format=json --workspace -- \
+            -A clippy::all \
+            -W clippy::integer_arithmetic \
+            | tee ../clippy_result
+
+      - name: Get lints only for the relevant files
+        if: success()
+        run: |
+          python << END
+
+          #
+          # Create list of files + line numbers
+          #
+          import re
+          relevant_files = open("files_changed", "r") # git diff -U0 output
+          file_names = []
+
+          for line in relevant_files.readlines():
+            line = line.strip()
+
+            # get file name
+            if line.startswith("diff --git a/"):
+              file_name = re.search('a/(.*) b/', line).group(1)
+              file_names.append({"name": file_name.strip(), "lines": []})
+
+            # get new code's lines number
+            if line.startswith("@@"):
+              search = re.search('\+(\d*)(\,\d*)?', line)
+              line_start = int(search.group(1))
+              line_end = search.group(2)
+              if line_end == None:
+                line_end = line_start
+              else:
+                line_end = line_start + int(line_end[1:])
+              # add these lines to last file_name added
+              file_names[-1]["lines"].append([line_start, line_end])
+
+          print(file_names)
+          #
+          # Find relevant clippy results
+          #
+          import json
+          clippy_output = open("clippy_result", 'r')
+
+          # lint hit a file that was changed
+          lint_found = open("lint_found", "w")
+          # lint hit a file and a line number that was added
+          lint_lines_found = open("lint_lines_found", "w")
+
+          for file_name in file_names:
+            # find that file in cargo clippy output
+            for line in clippy_output.readlines():
+              try:
+                obj = json.loads(line.strip())
+                if "message" in obj:
+                  for span in obj["message"]["spans"]:
+                    # we found a file that was modified
+                    if span["file_name"] == file_name["name"]:
+                      message = obj["message"]["rendered"]
+                      lint_found.write(message)
+
+                      print("trying to find a line hit for ", span["file_name"], span["line_start"], span["line_end"])
+                      for lines in file_name["lines"]:
+                        print("checking", lines)
+                        # we found a line that was modified
+                        if span["line_start"] >= lines[0] and span["line_end"] <= lines[1]:
+                          print("lines hit for", span["file_name"])
+                          lint_lines_found.write(message)
+                          break
+              except:
+                pass
+
+            # reset clippy output for next pass
+            clippy_output.seek(0)
+          END
+
+      - name: Display lint for file
+        if: success()
+        run: |
+          cat lint_found
+
+      - name: Display lint for file + lines
+        if: success()
+        run: |
+          cat lint_lines_found
+
+      - name: Write comment on PR if lints are found
+        if: success()
+        uses: actions/github-script@0.5.0
+        env:
+          PULL_ID: ${{ github.event.client_payload.pull_id }}
+          OWNER: ${{ github.event.client_payload.owner }}
+        with:
+          github-token: ${{secrets.MIRAI_BOT}}
+          script: |
+            const fs = require('fs');
+            var path = require('path');
+
+            async function main() {
+              // get lints 
+              const lint_found = fs.readFileSync('lint_found');
+              const lint_lines_found = fs.readFileSync('lint_lines_found');
+
+              // don't post anything if relevant files are not hit
+              if (lint_lines_found.length < 5) { // empty hack
+                return;
+              }
+
+              // create the message
+              var message = `Hello you!
+
+            It looks like #integer-overflow found some allowed lints that might be useful to you:
+
+            <details><summary>click here to reveal them</summary>
+            <pre><code>${lint_lines_found}</code></pre>
+            </details>
+            `;
+
+              // delete previous comments from MIRAI-BOT that includes the tag "#integer-overflow"
+              const comments = await github.pulls.listComments({
+                owner: "libra",
+                repo: "libra",
+                pull_number: process.env.PULL_ID
+              });
+              for (let comment of comments.data) {
+                if (comment.user.login === "mirai-bot" && comment.body.includes("#integer-overflow")) {
+                  await github.pulls.deleteComment({
+                    owner: "libra",
+                    repo: "libra",
+                    comment_id: comment.id
+                  });
+                }
+              }
+
+              // comment
+              await github.issues.createComment({
+                owner: "libra",
+                repo: "libra",
+                issue_number: process.env.PULL_ID,
+                body: message
+              });
+              console.log(message);
+
+              // warn devs
+              console.log("Clippy found warnings on https://github.com/libra/libra/pull/" + process.env.PULL_ID);
+              throw "Clippy warnings were found!";
+            }
+
+            main();
