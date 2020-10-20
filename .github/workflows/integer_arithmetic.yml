@@ -194,7 +194,8 @@ jobs:
               // create the message
               var message = `Hello you!
 
-            It looks like #integer-overflow found some allowed lints that might be useful to you:
+            It looks like #integer-overflow found some integer operations that could potentially result in unexpected behaviors.
+            Please refer to the [coding guideline](https://github.com/libra/libra/pull/6525) in order to fix the issues: 
 
             <details><summary>click here to reveal them</summary>
             <pre><code>${lint_lines_found}</code></pre>
