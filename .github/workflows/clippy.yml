@@ -23,18 +23,33 @@ jobs:
         run: |
           echo "action triggerd by https://github.com/libra/libra/pull/$PULL_ID"
 
-      - name: don't run this for users who don't want it
+      - name: Whitelist of users
+        uses: actions/github-script@0.5.0
         env:
-          OWNER: ${{ github.event.client_payload.owner }}
-        run: |
-          python << END
-          import os
-          import sys
-          nope = ["mimoo"]
-          print("owner is", os.environ['OWNER'])
-          if os.environ['OWNER'] not in nope:
-            sys.exit(1)
-          END
+          PULL_ID: ${{ github.event.client_payload.pull_id }}
+        with:
+          github-token: ${{secrets.MIRAI_BOT}}
+          script: |
+            const fs = require('fs');
+            var path = require('path');
+
+            async function main() {
+              // get comments on PR
+              const pullrequest = await github.pulls.get({
+                owner: "libra",
+                repo: "libra",
+                pull_number: process.env.PULL_ID
+              });
+
+              // allowlist
+              var allowlist = ["mimoo"];
+              if (!allowlist.includes(pullrequest.user.login) {
+                console.log(pullrequest.user.login + " is not in the allowlist of this github action");
+                throw "Clippy warnings were found!";
+              }
+            }
+
+            main();
 
       - name: Checkout the PR
         if: success()
