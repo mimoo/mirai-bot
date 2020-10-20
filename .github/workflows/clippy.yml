@@ -43,6 +43,7 @@ jobs:
 
               // allowlist
               var allowlist = ["mimoo"];
+              console.log(pullrequest);
               if (!allowlist.includes(pullrequest.user.login)) {
                 console.log(pullrequest.user.login + " is not in the allowlist of this github action");
                 throw "Clippy warnings were found!";
