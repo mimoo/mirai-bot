@@ -45,7 +45,7 @@ jobs:
               /*
               var allowlist = ["mimoo"];
               if (!allowlist.includes(pullrequest.data.user.login)) {
-                console.log(pullrequest.user.login + " is not in the allowlist of this github action");
+                console.log(pullrequest.data.user.login + " is not in the allowlist of this github action");
                 throw "Clippy warnings were found!";
               }
               */
