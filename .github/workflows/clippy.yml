@@ -339,8 +339,8 @@ jobs:
                 repo: "libra",
                 pull_number: process.env.PULL_ID
               });
+              console.log("comments", comments);
               for (let comment of comments.data) {
-                console.log("comment in comments.data");
                 console.log("comment.body", comment.body);
                 console.log("comment.body includes #clippy", comment.body.includes("#clippy"));
                 if (comment.user.login === "MIRAI-bot" && comment.body.includes("#clippy")) {
