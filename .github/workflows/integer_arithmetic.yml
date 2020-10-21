@@ -138,10 +138,14 @@ jobs:
               try:
                 obj = json.loads(line.strip())
                 if "message" in obj:
+                  # double check if it's integer-arithmetic
+                  message = obj["message"]["rendered"]
+                  if "integer arithmetic" not in message:
+                    continue
+
                   for span in obj["message"]["spans"]:
                     # we found a file that was modified
                     if span["file_name"] == file_name["name"]:
-                      message = obj["message"]["rendered"]
                       lint_found.write(message)
 
                       print("trying to find a line hit for ", span["file_name"], span["line_start"], span["line_end"])
