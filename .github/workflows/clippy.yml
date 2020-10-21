@@ -17,33 +17,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Write comment on PR if lints are found
-        if: success()
-        uses: actions/github-script@0.5.0
-        env:
-          PULL_ID: ${{ github.event.client_payload.pull_id }}
-          OWNER: ${{ github.event.client_payload.owner }}
-        with:
-          github-token: ${{secrets.MIRAI_BOT}}
-          script: |
-            async function main() {
-              const comments = await github.issues.listComments({
-                owner: "libra",
-                repo: "libra",
-                issue_number: 6552
-              });
-              console.log("comments", comments);
-              for (let comment of comments.data) {
-                console.log("comment.body", comment.body);
-                console.log("comment.body includes #clippy", comment.body.includes("#clippy"));
-                if (comment.user.login === "MIRAI-bot" && comment.body.includes("#clippy")) {
-                  console.log("yes");
-                }
-              }
-            }
-
-            main();
-
       - name: Who triggered this?
         env:
           PULL_ID: ${{ github.event.client_payload.pull_id }}
@@ -361,17 +334,14 @@ jobs:
             `;
 
               // delete previous comments from MIRAI-BOT that includes the tag "#clippy"
-              const comments = await github.pulls.listComments({
+              const comments = await github.issues.listComments({
                 owner: "libra",
                 repo: "libra",
-                pull_number: process.env.PULL_ID
+                issue_number: process.env.PULL_ID
               });
-              console.log("comments", comments);
               for (let comment of comments.data) {
-                console.log("comment.body", comment.body);
-                console.log("comment.body includes #clippy", comment.body.includes("#clippy"));
                 if (comment.user.login === "MIRAI-bot" && comment.body.includes("#clippy")) {
-                  await github.pulls.deleteComment({
+                  await github.issues.deleteComment({
                     owner: "libra",
                     repo: "libra",
                     comment_id: comment.id

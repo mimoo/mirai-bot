@@ -190,14 +190,14 @@ jobs:
             `;
 
               // delete previous comments
-              const comments = await github.pulls.listComments({
+              const comments = await github.issues.listComments({
                 owner: "libra",
                 repo: "libra",
-                pull_number: process.env.PULL_ID
+                issue_number: process.env.PULL_ID
               });
               for (let comment of comments.data) {
                 if (comment.user.login === "MIRAI-bot" && && comment.body.includes("#mirai")) {
-                  await github.pulls.deleteComment({
+                  await github.issues.deleteComment({
                     owner: "libra",
                     repo: "libra",
                     comment_id: comment.id
