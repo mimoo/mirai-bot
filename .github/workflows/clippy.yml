@@ -159,7 +159,7 @@ jobs:
             -W clippy::maybe_infinite_iter \
             -W clippy::mem_forget \
             -W clippy::missing_const_for_fn \
-            -W clippy::missing_docs_in_private_items \
+            -A clippy::missing_docs_in_private_items \
             -W clippy::missing_errors_doc \
             -A clippy::missing_inline_in_public_items \
             -W clippy::module_name_repetitions \
