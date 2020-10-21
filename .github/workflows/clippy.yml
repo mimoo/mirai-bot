@@ -42,11 +42,13 @@ jobs:
               });
 
               // allowlist
+              /*
               var allowlist = ["mimoo"];
               if (!allowlist.includes(pullrequest.data.user.login)) {
                 console.log(pullrequest.data.user.login + " is not in the allowlist of this github action");
                 throw "user not in whitelist!";
               }
+              */
             }
 
             main();
