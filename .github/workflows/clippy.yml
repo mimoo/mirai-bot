@@ -80,12 +80,9 @@ jobs:
           rustup update
           rustup component add clippy --toolchain nightly
 
-          # run clippy with rules
+          # run clippy
           cargo +nightly clippy --quiet --message-format=json --workspace -- \
-            -W clippy::all \
-            -W clippy::pedantic \
-            -W clippy::nursery \
-            -W clippy::cargo \
+            -A clippy::all \
             \
             -W clippy::as_conversions \
             -W clippy::await_holding_lock \
@@ -105,6 +102,7 @@ jobs:
             -W clippy::debug_assert_with_mut_call \
             -W clippy::decimal_literal_representation \
             -W clippy::default_trait_access \
+            -W clippy::disallowed_method \
             -W clippy::doc_markdown \
             -W clippy::else_if_without_else \
             -W clippy::empty_enum \
@@ -134,7 +132,9 @@ jobs:
             -W clippy::indexing_slicing \
             -W clippy::inefficient_to_string \
             -W clippy::inline_always \
-            -W clippy::integer_arithmetic \
+            -A clippy::inline_asm_x86_att_syntax \ 
+            -A clippy::inline_asm_x86_intel_syntax \
+            -A clippy::integer_arithmetic \
             -W clippy::integer_division \
             -W clippy::invalid_upcast_comparisons \
             -W clippy::items_after_statements \
@@ -171,13 +171,15 @@ jobs:
             -W clippy::non_ascii_literal \
             -W clippy::option_if_let_else \
             -W clippy::option_option \
-            -W clippy::panic  \
+            -W clippy::panic \
+            -W clippy::panic_in_result_fn \
             -W clippy::path_buf_push_overwrite \
             -W clippy::pattern_type_mismatch \
             -W clippy::print_stdout \
             -W clippy::pub_enum_variant_names \
             -W clippy::range_minus_one \
             -W clippy::range_plus_one \
+            -W clippy::rc_buffer \
             -W clippy::redundant_closure_for_method_calls \
             -W clippy::redundant_pub_crate \
             -W clippy::rest_pat_in_fully_bound_structs \
