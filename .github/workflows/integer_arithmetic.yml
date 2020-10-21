@@ -47,19 +47,6 @@ jobs:
                   });
                 }
               }
-
-              // comment
-              await github.issues.createComment({
-                owner: "libra",
-                repo: "libra",
-                issue_number: process.env.PULL_ID,
-                body: message
-              });
-              console.log(message);
-
-              // warn devs
-              console.log("Clippy found warnings on https://github.com/libra/libra/pull/" + process.env.PULL_ID);
-              throw "Clippy warnings were found!";
             }
 
             main();
