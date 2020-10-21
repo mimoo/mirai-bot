@@ -27,10 +27,10 @@ jobs:
           github-token: ${{secrets.MIRAI_BOT}}
           script: |
             async function main() {
-              const comments = await github.pulls.listComments({
+              const comments = await github.issues.listComments({
                 owner: "libra",
                 repo: "libra",
-                pull_number: 6552
+                issue_number: 6552
               });
               console.log("comments", comments);
               for (let comment of comments.data) {
