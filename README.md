@@ -1,5 +1,7 @@
 # MIRAI BOT
 
+**Warning: keep reading, this has almost nothing to do with the [MIRAI static analyzer](https://github.com/facebookexperimental/MIRAI)**.
+
 MIRAI bot is essentially a repository that gets triggered when a new PR gets submitted to the [libra repository](https://www.github.com/libra/libra).
 
 This allows us to perform github actions on libra without having admin access to the repo.
@@ -13,8 +15,7 @@ It only displays the full result to people added to the whitelist.
 
 ## Clippy
 
-This runs [all the clippy rules](https://rust-lang.github.io/rust-clippy/master/) on a PR (last updated to reflect all rules of clippy v0.0.212, it is missing panic_in_fn_result).
-It only displays the result to people added to the whitelist.
+This runs [all the clippy rules](https://rust-lang.github.io/rust-clippy/master/) on a PR.
 
 ## Integer Arithmetic
 
