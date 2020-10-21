@@ -17,6 +17,53 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Write comment on PR if lints are found
+        if: success()
+        uses: actions/github-script@0.5.0
+        env:
+          PULL_ID: ${{ github.event.client_payload.pull_id }}
+          OWNER: ${{ github.event.client_payload.owner }}
+        with:
+          github-token: ${{secrets.MIRAI_BOT}}
+          script: |
+            async function main() {
+              const comments = await github.issues.listComments({
+                owner: "libra",
+                repo: "libra",
+                issue_number: process.env.PULL_ID
+              });
+              for (let comment of comments.data) {
+                console.log(comment.user);
+                console.log(comment.body);
+                console.log(comment.user.login === "MIRAI-bot");
+                console.log(comment.body.includes("#integer-overflow"));
+                
+                if (comment.user.login === "MIRAI-bot" && comment.body.includes("#integer-overflow")) {
+                  console.log("yes", comment.id);
+                  await github.issues.deleteComment({
+                    owner: "libra",
+                    repo: "libra",
+                    comment_id: comment.id
+                  });
+                }
+              }
+
+              // comment
+              await github.issues.createComment({
+                owner: "libra",
+                repo: "libra",
+                issue_number: process.env.PULL_ID,
+                body: message
+              });
+              console.log(message);
+
+              // warn devs
+              console.log("Clippy found warnings on https://github.com/libra/libra/pull/" + process.env.PULL_ID);
+              throw "Clippy warnings were found!";
+            }
+
+            main();
+
       - name: Who triggered this?
         env:
           PULL_ID: ${{ github.event.client_payload.pull_id }}
