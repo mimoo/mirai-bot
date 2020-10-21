@@ -82,7 +82,8 @@ jobs:
           rustup update
           rustup component add clippy --toolchain nightly
 
-          # run clippy
+          # run clippy "allow" lints in "warn" mode
+          # last lint update: https://github.com/rust-lang/rust-clippy/blob/master/CHANGELOG.md#rust-148
           cargo +nightly clippy --quiet --message-format=json --workspace -- \
             -A clippy::all \
             \
@@ -147,6 +148,7 @@ jobs:
             -W clippy::linkedlist \
             -W clippy::lossy_float_literal \
             -W clippy::macro_use_imports \
+            -W clippy::map_err_ignore \
             -W clippy::map_flatten \
             -W clippy::map_unwrap_or \
             -W clippy::match_bool \
