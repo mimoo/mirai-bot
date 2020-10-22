@@ -335,6 +335,8 @@ jobs:
             <details><summary>click here to reveal them</summary>
             <pre><code>${lint_lines_found}</code></pre>
             </details>
+
+            If you want these helpful messages on your PRs too, [ask here](https://github.com/mimoo/mirai-bot/issues).
             `;
 
               // delete previous comments from MIRAI-BOT that includes the tag "#clippy"
