@@ -1,4 +1,4 @@
-name: integer_arithmetic
+name: wannabe_land_blocking
 
 # Why `on: repository_dispatch`?
 #
@@ -13,7 +13,7 @@ on:
     types: [new_PR]
 
 jobs:
-  run_integer_arithmetic:
+  run_wannabe_land_blocking:
     runs-on: ubuntu-latest
 
     steps:
@@ -86,6 +86,8 @@ jobs:
           cargo +nightly clippy --quiet --message-format=json --workspace -- \
             -A clippy::all \
             -W clippy::integer_arithmetic \
+            -W clippy::unwrap_in_result \
+            -W clippy::panic_in_result_fn \
             | tee ../clippy_result
 
       - name: Get lints only for the relevant files
@@ -196,24 +198,24 @@ jobs:
               }
 
               // create the message
-              var message = `Hello you!
+              var message = `/!\ hey hey /!\
 
-            It looks like #integer-overflow found some integer operations that could potentially result in unexpected behaviors.
-            Please refer to the [coding guideline](https://github.com/libra/libra/pull/6525) in order to fix the issues: 
+            It looks like #wannabe-land-blocking found some issues that are not yet land blocking, but will be in the future.
+            Please fix these: 
 
             <details><summary>click here to reveal them</summary>
             <pre><code>${lint_lines_found}</code></pre>
             </details>
             `;
 
-              // delete previous comments from MIRAI-BOT that includes the tag "#integer-overflow"
+              // delete previous comments from MIRAI-BOT that includes the tag "#wannabe-land-blocking"
               const comments = await github.issues.listComments({
                 owner: "libra",
                 repo: "libra",
                 issue_number: process.env.PULL_ID
               });
               for (let comment of comments.data) {
-                if (comment.user.login === "MIRAI-bot" && comment.body.includes("#integer-overflow")) {
+                if (comment.user.login === "MIRAI-bot" && comment.body.includes("#wannabe-land-blocking")) {
                   await github.issues.deleteComment({
                     owner: "libra",
                     repo: "libra",

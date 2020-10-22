@@ -17,9 +17,9 @@ It only displays the full result to people added to the whitelist.
 
 This runs [all the clippy rules](https://rust-lang.github.io/rust-clippy/master/) on a PR.
 
-## Integer Arithmetic
+## Wannabe-Land-Blocking
 
-This runs the integer-arithmetic clippy rule on a PR.
+This runs a set of selected clippy rule on a PR. These rules are ones we want to have as land blocking tests in CI, but cannot at the moment for various reasons.
 
 ## Move-prover
 
