@@ -198,7 +198,7 @@ jobs:
               }
 
               // create the message
-              var message = `/!\ hey hey /!\
+              var message = `Hey hey!
 
             It looks like #wannabe-land-blocking found some issues that are not yet land blocking, but will be in the future.
             Please fix these: 
