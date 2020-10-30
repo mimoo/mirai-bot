@@ -88,6 +88,7 @@ jobs:
             -W clippy::integer_arithmetic \
             -W clippy::unwrap_in_result \
             -W clippy::panic_in_result_fn \
+            -W clippy::indexing_slicing \
             | tee ../clippy_result
 
       - name: Get lints only for the relevant files
@@ -188,7 +189,7 @@ jobs:
             var path = require('path');
 
             async function main() {
-              // get lints 
+              // get lints
               const lint_found = fs.readFileSync('lint_found');
               const lint_lines_found = fs.readFileSync('lint_lines_found');
 
@@ -201,7 +202,7 @@ jobs:
               var message = `Hey hey!
 
             It looks like #wannabe-land-blocking found some issues that are not yet land blocking, but will be in the future.
-            Please fix these: 
+            Please fix these:
 
             <details><summary>click here to reveal them</summary>
             <pre><code>${lint_lines_found}</code></pre>
