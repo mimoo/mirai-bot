@@ -28,3 +28,7 @@ TKTK
 ## Move-coverage
 
 TKTK
+
+## Dephell
+
+Runs [cargo-dephell](https://github.com/mimoo/cargo-dephell) on a PR and uploads it to the action
