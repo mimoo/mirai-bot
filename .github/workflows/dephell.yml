@@ -46,7 +46,7 @@ jobs:
           cargo install cargo-dephell
 
           # run dephell
-          cargo cargo dephell -o report.html --github-token MIRAI-bot:$TOKEN
+          cargo dephell -o report.html --github-token MIRAI-bot:$TOKEN
 
       - name: upload html report
         uses: actions/upload-artifact@v2
