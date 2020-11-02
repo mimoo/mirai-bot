@@ -53,3 +53,7 @@ jobs:
         with:
           name: dephell_report
           path: libra/report.html
+
+      - name: link to report
+        run: |
+          echo "https://github.com/mimoo/mirai-bot/actions/runs/$GITHUB_RUN_ID"
