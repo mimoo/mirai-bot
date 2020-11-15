@@ -1,4 +1,4 @@
-name: wannabe_land_blocking
+name: clippy
 
 # Why `on: repository_dispatch`?
 #
@@ -13,7 +13,7 @@ on:
     types: [new_PR]
 
 jobs:
-  run_wannabe_land_blocking:
+  run_clippy:
     runs-on: ubuntu-latest
 
     steps:
@@ -42,13 +42,11 @@ jobs:
               });
 
               // allowlist
-              /*
-              var allowlist = ["mimoo", "xvschneider"];
+              var allowlist = ["mimoo", "anomalroil", "xvschneider"];
               if (!allowlist.includes(pullrequest.data.user.login)) {
                 console.log(pullrequest.data.user.login + " is not in the allowlist of this github action");
-                throw "Clippy warnings were found!";
+                throw "user not in whitelist!";
               }
-              */
             }
 
             main();
@@ -82,10 +80,11 @@ jobs:
           rustup update
           rustup component add clippy --toolchain nightly
 
-          # run clippy with rules
+          # run clippy "allow" lints in "warn" mode
+          # last lint update: https://github.com/rust-lang/rust-clippy/blob/master/CHANGELOG.md#rust-148
           cargo +nightly clippy --quiet --message-format=json --workspace -- \
             -A clippy::all \
-            -W clippy::integer_arithmetic \
+            \
             -W clippy::unwrap_in_result \
             -W clippy::panic_in_result_fn \
             -W clippy::indexing_slicing \
@@ -141,14 +140,10 @@ jobs:
               try:
                 obj = json.loads(line.strip())
                 if "message" in obj:
-                  # double check if it's integer-arithmetic
-                  message = obj["message"]["rendered"]
-                  if "integer arithmetic" not in message:
-                    continue
-
                   for span in obj["message"]["spans"]:
                     # we found a file that was modified
                     if span["file_name"] == file_name["name"]:
+                      message = obj["message"]["rendered"]
                       lint_found.write(message)
 
                       print("trying to find a line hit for ", span["file_name"], span["line_start"], span["line_end"])
@@ -199,24 +194,31 @@ jobs:
               }
 
               // create the message
-              var message = `Hey hey!
+              var message = `Hello you!
 
-            It looks like #wannabe-land-blocking found some issues that are not yet land blocking, but will be in the future.
-            Please fix these:
+            It looks like #clippy found some allowed lints that might be useful to you:
 
             <details><summary>click here to reveal them</summary>
             <pre><code>${lint_lines_found}</code></pre>
             </details>
+
+            If you want these helpful messages on your PRs too, [ask here](https://github.com/mimoo/mirai-bot/issues).
             `;
 
-              // delete previous comments from MIRAI-BOT that includes the tag "#wannabe-land-blocking"
+              // delete previous comments from MIRAI-BOT that includes the tag "#clippy"
               const comments = await github.issues.listComments({
                 owner: "libra",
                 repo: "libra",
                 issue_number: process.env.PULL_ID
               });
+              console.log("comments", comments);
               for (let comment of comments.data) {
-                if (comment.user.login === "MIRAI-bot" && comment.body.includes("#wannabe-land-blocking")) {
+                console.log("comment", comment);
+                console.log("comment.user.login", comment.user.login);
+                console.log(comment.user.login === "MIRAI-bot");
+                console.log("comment.body", comment.body);
+                console.log(comment.body.includes("#clippy"));
+                if (comment.user.login === "MIRAI-bot" && comment.body.includes("#clippy")) {
                   await github.issues.deleteComment({
                     owner: "libra",
                     repo: "libra",
