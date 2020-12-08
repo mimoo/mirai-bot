@@ -42,7 +42,7 @@ jobs:
               });
 
               // allowlist
-              var allowlist = ["mimoo", "anomalroil"];
+              var allowlist = ["mimoo", "anomalroil", "xvschneider"];
               if (!allowlist.includes(pullrequest.data.user.login)) {
                 console.log(pullrequest.data.user.login + " is not in the allowlist of this github action");
                 throw "user not in whitelist!";
@@ -130,10 +130,10 @@ jobs:
             -A clippy::implicit_return \
             -W clippy::implicit_saturating_sub \
             -W clippy::imprecise_flops \
-            -W clippy::indexing_slicing \
+            -A clippy::indexing_slicing \
             -W clippy::inefficient_to_string \
             -W clippy::inline_always \
-            -A clippy::inline_asm_x86_att_syntax \ 
+            -A clippy::inline_asm_x86_att_syntax \
             -A clippy::inline_asm_x86_intel_syntax \
             -A clippy::integer_arithmetic \
             -W clippy::integer_division \
@@ -174,7 +174,7 @@ jobs:
             -W clippy::option_if_let_else \
             -W clippy::option_option \
             -W clippy::panic \
-            -W clippy::panic_in_result_fn \
+            -A clippy::panic_in_result_fn \
             -W clippy::path_buf_push_overwrite \
             -W clippy::pattern_type_mismatch \
             -W clippy::print_stdout \
@@ -209,7 +209,7 @@ jobs:
             -W clippy::unsafe_derive_deserialize \
             -W clippy::unseparated_literal_suffix \
             -W clippy::unused_self \
-            -W clippy::unwrap_in_result \
+            -A clippy::unwrap_in_result \
             -W clippy::unwrap_used \
             -W clippy::use_debug \
             -W clippy::use_self \
@@ -318,7 +318,7 @@ jobs:
             var path = require('path');
 
             async function main() {
-              // get lints 
+              // get lints
               const lint_found = fs.readFileSync('lint_found');
               const lint_lines_found = fs.readFileSync('lint_lines_found');
 
