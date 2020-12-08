@@ -6,110 +6,109 @@ on:
 
 jobs:
   run_Move_Coverage:
-
     runs-on: ubuntu-18.04
 
     steps:
-    - name: Checkout libra
-      uses: actions/checkout@v2
-      with:
-        path: "libra"
-        fetch-depth: 50 # this is to make sure we obtain the target base commit
-        repository: ${{ github.event.client_payload.owner }}/${{ github.event.client_payload.repo }} # repo of the forked libra/libra
-        ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
+      - name: Checkout libra
+        uses: actions/checkout@v2
+        with:
+          path: "libra"
+          fetch-depth: 50 # this is to make sure we obtain the target base commit
+          repository: ${{ github.event.client_payload.owner }}/${{ github.event.client_payload.repo }} # repo of the forked libra/diem
+          ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
 
-    - name: Detect the changes in move-stdlib
-      working-directory: ./libra
-      env:
-        BASE: ${{ github.event.client_payload.base_ref }}
-        PULL_ID: ${{ github.event.client_payload.pull_id }}
-      run: |
-        echo Test requested by https://github.com/libra/libra/pull/$PULL_ID
-        git diff --name-only $BASE
-        if (git diff --name-only $BASE | grep "language/ir-testsuite\|language/move-lang/tests/functional\|language/stdlib\|language/e2e-tests")
-        then
-          echo "::set-env name=RUN_TEST::yes"
-          echo "::set-env name=MOVE_VM_TRACE::$HOME/trace"
-          echo "::set-env name=LOG_PATH::$HOME/coverage_report"
-          echo "::set-env name=BASELINE_PATH::$HOME/baseline_coverage_report"
-          echo "::set-env name=JOB_INS_ID::`curl -s https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID | egrep '/[0-9]{9}\?' -o | egrep '[0-9]{9}' -o`"
-        else
-          echo "::set-env name=RUN_TEST::no"
-        fi
+      - name: Detect the changes in move-stdlib
+        working-directory: ./libra
+        env:
+          BASE: ${{ github.event.client_payload.base_ref }}
+          PULL_ID: ${{ github.event.client_payload.pull_id }}
+        run: |
+          echo Test requested by https://github.com/libra/diem/pull/$PULL_ID
+          git diff --name-only $BASE
+          if (git diff --name-only $BASE | grep "language/ir-testsuite\|language/move-lang/tests/functional\|language/stdlib\|language/e2e-tests")
+          then
+            echo "::set-env name=RUN_TEST::yes"
+            echo "::set-env name=MOVE_VM_TRACE::$HOME/trace"
+            echo "::set-env name=LOG_PATH::$HOME/coverage_report"
+            echo "::set-env name=BASELINE_PATH::$HOME/baseline_coverage_report"
+            echo "::set-env name=JOB_INS_ID::`curl -s https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID | egrep '/[0-9]{9}\?' -o | egrep '[0-9]{9}' -o`"
+          else
+            echo "::set-env name=RUN_TEST::no"
+          fi
 
-    - name: Creating Move coverage report
-      if: env.RUN_TEST == 'yes'
-      id: collect_move_coverage
-      working-directory: ./libra/language/tools/move-coverage
-      env:
-        BASE: ${{ github.event.client_payload.base_ref }}
-      timeout-minutes: 50 # normally, expected to be done within 10 mins.
-      run: |
-        set -o pipefail
-         rustup component add rustfmt
-        ./gather_stats.bash $LOG_PATH $BASELINE_PATH
-         git checkout $BASE
-         rm -rf $MOVE_VM_TRACE
-        ./gather_stats.bash $BASELINE_PATH $BASELINE_PATH
-        err=$?
-        if [ $err -e 0 ]
-        then
-          echo "::set-env name=TEST_RESULT::pass"
-          exit 0
-        else
-          echo "::set-env name=TEST_RESULT::fail"
-          exit $err
-        fi
+      - name: Creating Move coverage report
+        if: env.RUN_TEST == 'yes'
+        id: collect_move_coverage
+        working-directory: ./libra/language/tools/move-coverage
+        env:
+          BASE: ${{ github.event.client_payload.base_ref }}
+        timeout-minutes: 50 # normally, expected to be done within 10 mins.
+        run: |
+          set -o pipefail
+           rustup component add rustfmt
+          ./gather_stats.bash $LOG_PATH $BASELINE_PATH
+           git checkout $BASE
+           rm -rf $MOVE_VM_TRACE
+          ./gather_stats.bash $BASELINE_PATH $BASELINE_PATH
+          err=$?
+          if [ $err -e 0 ]
+          then
+            echo "::set-env name=TEST_RESULT::pass"
+            exit 0
+          else
+            echo "::set-env name=TEST_RESULT::fail"
+            exit $err
+          fi
 
-    - name: Post the coverage report as a comment
-      if: env.RUN_TEST == 'yes'
-      uses: actions/github-script@0.6.0
-      env:
-        PULL_ID: ${{ github.event.client_payload.pull_id }}
-        ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
-      with:
-        github-token: ${{secrets.MIRAI_BOT}}
-        script: |
-          const fs = require('fs');
-          const util = require('util');
-          var path = util.format('%s', process.env.LOG_PATH);
-          var baseline_path = util.format('%s', process.env.BASELINE_PATH);
+      - name: Post the coverage report as a comment
+        if: env.RUN_TEST == 'yes'
+        uses: actions/github-script@0.6.0
+        env:
+          PULL_ID: ${{ github.event.client_payload.pull_id }}
+          ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
+        with:
+          github-token: ${{secrets.MIRAI_BOT}}
+          script: |
+            const fs = require('fs');
+            const util = require('util');
+            var path = util.format('%s', process.env.LOG_PATH);
+            var baseline_path = util.format('%s', process.env.BASELINE_PATH);
 
-          test_result = (process.env.TEST_RESULT == undefined) ? 'timeout (> 50 mins)' : process.env.TEST_RESULT;
+            test_result = (process.env.TEST_RESULT == undefined) ? 'timeout (> 50 mins)' : process.env.TEST_RESULT;
 
-          if (process.env.JOB_INS_ID.length == 9) {
-            link_to_log=`https://github.com/${process.env.GITHUB_REPOSITORY}/runs/${process.env.JOB_INS_ID}?check_suite_focus=true#step:7:1`;
-          }
-          else {
-            link_to_log=`https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
-          }
+            if (process.env.JOB_INS_ID.length == 9) {
+              link_to_log=`https://github.com/${process.env.GITHUB_REPOSITORY}/runs/${process.env.JOB_INS_ID}?check_suite_focus=true#step:7:1`;
+            }
+            else {
+              link_to_log=`https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            }
 
-          var current_coverage = fs.readFile(path, function(err, current_coverage) {
-              console.log("err:", err);
-              console.log("curr path:", path);
-              fs.readFile(baseline_path, function(err, previous_coverage) {
-                  console.log("err:", err);
-                  console.log("old path:", baseline_path);
-                  var message = `**A wild Move coverage report has appeared!**
+            var current_coverage = fs.readFile(path, function(err, current_coverage) {
+                console.log("err:", err);
+                console.log("curr path:", path);
+                fs.readFile(baseline_path, function(err, previous_coverage) {
+                    console.log("err:", err);
+                    console.log("old path:", baseline_path);
+                    var message = `**A wild Move coverage report has appeared!**
 
-          <details><summary>New coverage report</summary>
-          <pre><code>${current_coverage}</code></pre>
-          </details>
+            <details><summary>New coverage report</summary>
+            <pre><code>${current_coverage}</code></pre>
+            </details>
 
-          <details><summary>Baseline coverage report</summary>
-          <pre><code>${previous_coverage}</code></pre>
-          </details>
+            <details><summary>Baseline coverage report</summary>
+            <pre><code>${previous_coverage}</code></pre>
+            </details>
 
-          If these two differ, you should look at updating the baseline, or adding more tests.
+            If these two differ, you should look at updating the baseline, or adding more tests.
 
-          You can get more details [here](${link_to_log})
-                  `;
-                  console.log(message);
-                  //github.issues.createComment({
-                  //    owner: "libra",
-                  //    repo: "libra",
-                  //    issue_number: process.env.PULL_ID,
-                  //    body: message,
-                  //  });
-              });
-          });
+            You can get more details [here](${link_to_log})
+                    `;
+                    console.log(message);
+                    //github.issues.createComment({
+                    //    owner: "libra",
+                    //    repo: "libra",
+                    //    issue_number: process.env.PULL_ID,
+                    //    body: message,
+                    //  });
+                });
+            });
