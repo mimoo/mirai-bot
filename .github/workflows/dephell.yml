@@ -49,12 +49,13 @@ jobs:
           # generate summaries
           cd master
           cargo x generate-summaries
-          cd - 
+          cd ..
 
           cd libra 
           cargo x generate-summaries
-          cd - 
+          cd ..
 
+          # debug
           ls
           echo "okey1"
           ls ../ 
@@ -63,8 +64,9 @@ jobs:
           echo "okey3"
 
           # create diff
+          cd master
           output="$(cargo x diff-summary target/summaries/summary-release.toml ../libra/target/summaries/summary-release.toml)"
-          cd -
+          cd ..
           echo "${output}"
 
           # get download URLs
