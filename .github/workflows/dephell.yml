@@ -73,7 +73,9 @@ jobs:
           set -x
           set -e
 
-          output="$(cargo x diff-summary master/target/summaries/summary-release.toml libra/summaries/summary-release.toml)"
+          cd master
+          output="$(cargo x diff-summary target/summaries/summary-release.toml ../libra/summaries/summary-release.toml)"
+          cd -
           echo "${output}"
 
           # get download URLs
