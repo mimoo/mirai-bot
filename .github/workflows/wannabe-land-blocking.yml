@@ -21,7 +21,7 @@ jobs:
         env:
           PULL_ID: ${{ github.event.client_payload.pull_id }}
         run: |
-          echo "action triggerd by https://github.com/libra/diem/pull/$PULL_ID"
+          echo "action triggerd by https://github.com/diem/diem/pull/$PULL_ID"
 
       - name: Whitelist of users
         uses: actions/github-script@0.5.0
@@ -59,7 +59,7 @@ jobs:
         with:
           path: "libra"
           fetch-depth: 50 # this is to make sure we obtain the target base commit
-          repository: ${{ github.event.client_payload.owner }}/${{ github.event.client_payload.repo }} # repo of the forked libra/diem
+          repository: ${{ github.event.client_payload.owner }}/${{ github.event.client_payload.repo }} # repo of the forked diem/diem
           ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
 
       - name: Get files that were changed
@@ -235,7 +235,7 @@ jobs:
               console.log(message);
 
               // warn devs
-              console.log("Clippy found warnings on https://github.com/libra/diem/pull/" + process.env.PULL_ID);
+              console.log("Clippy found warnings on https://github.com/diem/diem/pull/" + process.env.PULL_ID);
               throw "Clippy warnings were found!";
             }
 

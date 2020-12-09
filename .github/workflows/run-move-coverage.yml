@@ -14,7 +14,7 @@ jobs:
         with:
           path: "libra"
           fetch-depth: 50 # this is to make sure we obtain the target base commit
-          repository: ${{ github.event.client_payload.owner }}/${{ github.event.client_payload.repo }} # repo of the forked libra/diem
+          repository: ${{ github.event.client_payload.owner }}/${{ github.event.client_payload.repo }} # repo of the forked diem/diem
           ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
 
       - name: Detect the changes in move-stdlib
@@ -23,7 +23,7 @@ jobs:
           BASE: ${{ github.event.client_payload.base_ref }}
           PULL_ID: ${{ github.event.client_payload.pull_id }}
         run: |
-          echo Test requested by https://github.com/libra/diem/pull/$PULL_ID
+          echo Test requested by https://github.com/diem/diem/pull/$PULL_ID
           git diff --name-only $BASE
           if (git diff --name-only $BASE | grep "language/ir-testsuite\|language/move-lang/tests/functional\|language/stdlib\|language/e2e-tests")
           then

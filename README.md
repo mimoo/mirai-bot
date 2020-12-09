@@ -2,7 +2,7 @@
 
 **Warning: keep reading, this has almost nothing to do with the [MIRAI static analyzer](https://github.com/facebookexperimental/MIRAI)**.
 
-MIRAI bot is essentially a repository that gets triggered when a new PR gets submitted to the [libra repository](https://www.github.com/libra/diem).
+MIRAI bot is essentially a repository that gets triggered when a new PR gets submitted to the [libra repository](https://www.github.com/diem/diem).
 
 This allows us to perform github actions on libra without having admin access to the repo.
 
