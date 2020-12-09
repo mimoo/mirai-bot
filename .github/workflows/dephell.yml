@@ -46,11 +46,24 @@ jobs:
           set -x
           set -e
 
+          # generate summaries
           cd master
+          cargo x generate-summaries
+          cd - 
+
+          cd libra 
+          cargo x generate-summaries
+          cd - 
+
           ls
+          echo "okey1"
           ls ../ 
+          echo "okey2"
           ls ../libra
-          output="$(cargo x diff-summary target/summaries/summary-release.toml ../libra/summaries/summary-release.toml)"
+          echo "okey3"
+
+          # create diff
+          output="$(cargo x diff-summary target/summaries/summary-release.toml ../libra/target/summaries/summary-release.toml)"
           cd -
           echo "${output}"
 
