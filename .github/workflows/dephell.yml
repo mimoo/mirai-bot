@@ -23,6 +23,42 @@ jobs:
         run: |
           echo "action triggerd by https://github.com/diem/diem/pull/$PULL_ID"
 
+      - name: Only run on dependabot
+        uses: actions/github-script@0.5.0
+        env:
+          PULL_ID: ${{ github.event.client_payload.pull_id }}
+        with:
+          github-token: ${{secrets.MIRAI_BOT}}
+          script: |
+            const fs = require('fs');
+            var path = require('path');
+
+            async function main() {
+              // get info on PR
+              const pullrequest = await github.pulls.get({
+                owner: "libra",
+                repo: "libra",
+                pull_number: process.env.PULL_ID
+              });
+
+              // allowlist
+              var allowlist = ["dependabot[bot]"];
+              if (!allowlist.includes(pullrequest.data.user.login)) {
+                throw "not a dependabot PR";
+              }
+            }
+
+            main();
+
+      - name: Checkout master
+        if: success()
+        uses: actions/checkout@v2
+        with:
+          path: "master"
+          fetch-depth: 1 # this is to make sure we obtain the target base commit
+          repository: diem/diem # repo of the forked diem/diem
+          ref: master # commit that triggered the PR
+
       - name: Checkout the PR
         if: success()
         uses: actions/checkout@v2
@@ -57,3 +93,33 @@ jobs:
       - name: link to report
         run: |
           echo "https://github.com/mimoo/mirai-bot/actions/runs/$GITHUB_RUN_ID"
+
+      - name: diff
+        run: |
+          set -x
+          set -e
+
+          output="$(cargo x diff-summary master/target/summaries/summary-release.toml libra/summaries/summary-release.toml)"
+          echo "${output}"
+
+          # get download URLs
+          DEP_NAME="cargo-dephell"
+          VERSION="0.1.0"
+          RESULT1=$(curl "https://crates.io/api/v1/crates/$NAME" | jq '.versions[] | select(.num == "'"$VERSION"'") | .dl_path')
+
+          # get code
+          mkdir images
+          cd images
+          wget "https://crates.io$RESULT1" -O crate1.tar.gz
+          mkdir out1
+          tar -xvf crate1.tar.gz -C out1
+
+          # html diff
+          npm install -g diff2html-cli
+          git diff -u out1 out2 | diff2html -s line -F report.html -d word -i stdin
+
+      - name: upload html report
+        uses: actions/upload-artifact@v2
+        with:
+          name: depdiff
+          path: report.html
