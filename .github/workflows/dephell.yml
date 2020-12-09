@@ -23,33 +23,6 @@ jobs:
         run: |
           echo "action triggerd by https://github.com/diem/diem/pull/$PULL_ID"
 
-      - name: Only run on dependabot
-        uses: actions/github-script@0.5.0
-        env:
-          PULL_ID: ${{ github.event.client_payload.pull_id }}
-        with:
-          github-token: ${{secrets.MIRAI_BOT}}
-          script: |
-            const fs = require('fs');
-            var path = require('path');
-
-            async function main() {
-              // get info on PR
-              const pullrequest = await github.pulls.get({
-                owner: "libra",
-                repo: "libra",
-                pull_number: process.env.PULL_ID
-              });
-
-              // allowlist
-              var allowlist = ["dependabot[bot]"];
-              if (!allowlist.includes(pullrequest.data.user.login)) {
-                throw "not a dependabot PR";
-              }
-            }
-
-            main();
-
       - name: Checkout master
         if: success()
         uses: actions/checkout@v2
@@ -74,6 +47,9 @@ jobs:
           set -e
 
           cd master
+          ls
+          ls ../ 
+          ls ../libra
           output="$(cargo x diff-summary target/summaries/summary-release.toml ../libra/summaries/summary-release.toml)"
           cd -
           echo "${output}"
