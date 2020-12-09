@@ -68,32 +68,6 @@ jobs:
           repository: ${{ github.event.client_payload.owner }}/${{ github.event.client_payload.repo }} # repo of the forked diem/diem
           ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
 
-      - name: run cargo dephell
-        if: success()
-        working-directory: ./libra
-        timeout-minutes: 60
-        env:
-          TOKEN: ${{secrets.MIRAI_BOT}}
-        run: |
-          set -x
-
-          # update rust and get dephell
-          rustup update
-          cargo install cargo-dephell
-
-          # run dephell
-          cargo dephell -o report.html --github-token MIRAI-bot:$TOKEN
-
-      - name: upload html report
-        uses: actions/upload-artifact@v2
-        with:
-          name: dephell_report
-          path: libra/report.html
-
-      - name: link to report
-        run: |
-          echo "https://github.com/mimoo/mirai-bot/actions/runs/$GITHUB_RUN_ID"
-
       - name: diff
         run: |
           set -x
