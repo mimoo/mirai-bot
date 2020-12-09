@@ -55,14 +55,6 @@ jobs:
           cargo x generate-summaries
           cd ..
 
-          # debug
-          ls
-          echo "okey1"
-          ls ../ 
-          echo "okey2"
-          ls ../libra
-          echo "okey3"
-
           # create diff
           cd master
           output="$(cargo x diff-summary target/summaries/summary-release.toml ../libra/target/summaries/summary-release.toml)"
