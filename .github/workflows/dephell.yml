@@ -41,6 +41,41 @@ jobs:
           repository: ${{ github.event.client_payload.owner }}/${{ github.event.client_payload.repo }} # repo of the forked diem/diem
           ref: ${{ github.event.client_payload.pull_ref }} # commit that triggered the PR
 
+      - name: Checkout cargo-diff
+        if: success()
+        uses: actions/checkout@v2
+        with:
+          path: "cargo-diff"
+          fetch-depth: 1 # this is to make sure we obtain the target base commit
+          repository: jnaulty/cargo-diff # repo of the forked diem/diem
+          ref: master # commit that triggered the PR
+
+      - name: run cargo-diff
+        run: |
+          set -x
+          set -e
+
+          # generate summaries
+          cd master 
+          cargo x generate-summaries
+          cd .. 
+          cd libra 
+          cargo x generate-summaries
+
+          # output some json
+          cargo x diff-summary ../master/target/summaries/summary-release.toml target/summaries/summary-release.toml json > ../guppy_output
+          cat ../guppy_output
+
+          # run cargo-diff
+          cd ../cargo-diff
+          sudo npm install -g diff2html-cli
+          pip3 install requests
+          python3 diff.py --guppy ../guppy_output
+
+      - name: who uses that dep?
+        run: |
+          cargo tree -i crossbeam-queue > tree_file
+
       - name: diff
         run: |
           set -x
@@ -57,7 +92,7 @@ jobs:
 
           # create diff
           cd master
-          output="$(cargo x diff-summary target/summaries/summary-release.toml ../libra/target/summaries/summary-release.toml)"
+          output="$(cargo x diff-summary target/summaries/summary-release.toml ../libra/target/summaries/summary-release.toml json)"
           cd ..
           echo "${output}"
 
