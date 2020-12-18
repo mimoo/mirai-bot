@@ -23,6 +23,33 @@ jobs:
         run: |
           echo "action triggerd by https://github.com/diem/diem/pull/$PULL_ID"
 
+      - name: Only run on dependabot
+        uses: actions/github-script@0.5.0
+        env:
+          PULL_ID: ${{ github.event.client_payload.pull_id }}
+        with:
+          github-token: ${{secrets.MIRAI_BOT}}
+          script: |
+            const fs = require('fs');
+            var path = require('path');
+
+            async function main() {
+              // get info on PR
+              const pullrequest = await github.pulls.get({
+                owner: "libra",
+                repo: "libra",
+                pull_number: process.env.PULL_ID
+              });
+
+              // allowlist
+              var allowlist = ["dependabot[bot]"];
+              if (!allowlist.includes(pullrequest.data.user.login)) {
+                throw "not a dependabot PR";
+              }
+            }
+
+            main();
+
       - name: Checkout master
         if: success()
         uses: actions/checkout@v2
@@ -76,44 +103,28 @@ jobs:
         run: |
           cargo tree -i crossbeam-queue > tree_file
 
-      - name: diff
+      - name: run cargo dephell
+        if: success()
+        working-directory: ./libra
+        timeout-minutes: 60
+        env:
+          TOKEN: ${{secrets.MIRAI_BOT}}
         run: |
           set -x
-          set -e
 
-          # generate summaries
-          cd master
-          cargo x generate-summaries
-          cd ..
+          # update rust and get dephell
+          rustup update
+          cargo install cargo-dephell
 
-          cd libra 
-          cargo x generate-summaries
-          cd ..
-
-          # create diff
-          cd master
-          output="$(cargo x diff-summary target/summaries/summary-release.toml ../libra/target/summaries/summary-release.toml json)"
-          cd ..
-          echo "${output}"
-
-          # get download URLs
-          DEP_NAME="cargo-dephell"
-          VERSION="0.1.0"
-          RESULT1=$(curl "https://crates.io/api/v1/crates/$NAME" | jq '.versions[] | select(.num == "'"$VERSION"'") | .dl_path')
-
-          # get code
-          mkdir images
-          cd images
-          wget "https://crates.io$RESULT1" -O crate1.tar.gz
-          mkdir out1
-          tar -xvf crate1.tar.gz -C out1
-
-          # html diff
-          npm install -g diff2html-cli
-          git diff -u out1 out2 | diff2html -s line -F report.html -d word -i stdin
+          # run dephell
+          cargo dephell -o report.html --github-token MIRAI-bot:$TOKEN
 
       - name: upload html report
         uses: actions/upload-artifact@v2
         with:
-          name: depdiff
-          path: report.html
+          name: dephell_report
+          path: libra/report.html
+
+      - name: link to report
+        run: |
+          echo "https://github.com/mimoo/mirai-bot/actions/runs/$GITHUB_RUN_ID"
