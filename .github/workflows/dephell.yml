@@ -135,3 +135,51 @@ jobs:
       - name: link to report
         run: |
           echo "https://github.com/mimoo/mirai-bot/actions/runs/$GITHUB_RUN_ID"
+
+      - name: Write comment on PR
+        if: success()
+        uses: actions/github-script@0.5.0
+        env:
+          PULL_ID: ${{ github.event.client_payload.pull_id }}
+          OWNER: ${{ github.event.client_payload.owner }}
+        with:
+          github-token: ${{secrets.MIRAI_BOT}}
+          script: |
+            const fs = require('fs');
+            var path = require('path');
+
+            async function main() {
+              // create the message
+              var message = `Hello here!
+
+            I'm here to help you review this dependency update.
+            You can check out the dephell report, as well as any diffs that could be generated from crates.io here: https://github.com/mimoo/mirai-bot/actions/runs/` + process.env.GITHUB_RUN_ID + `
+            `;
+
+              // delete previous comments from MIRAI-BOT that includes the tag "#dephell"
+              const comments = await github.issues.listComments({
+                owner: "diem",
+                repo: "diem",
+                issue_number: process.env.PULL_ID
+              });
+              for (let comment of comments.data) {
+                if (comment.user.login === "MIRAI-bot" && comment.body.includes("#dephell")) {
+                  await github.issues.deleteComment({
+                    owner: "diem",
+                    repo: "diem",
+                    comment_id: comment.id
+                  });
+                }
+              }
+
+              // comment
+              await github.issues.createComment({
+                owner: "diem",
+                repo: "diem",
+                issue_number: process.env.PULL_ID,
+                body: message
+              });
+              console.log(message);
+            }
+
+            main();
