@@ -153,7 +153,7 @@ jobs:
               var message = `Hello here!
 
             I'm here to help you review this dependency update.
-            You can check out the dephell report, as well as any diffs that could be generated from crates.io here: https://github.com/mimoo/mirai-bot/actions/runs/` + process.env.GITHUB_RUN_ID + `
+            You can check out the #dephell report, as well as any diffs that could be generated from crates.io here: https://github.com/mimoo/mirai-bot/actions/runs/` + process.env.GITHUB_RUN_ID + `
             `;
 
               // delete previous comments from MIRAI-BOT that includes the tag "#dephell"
