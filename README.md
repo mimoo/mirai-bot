@@ -6,7 +6,7 @@ MIRAI bot is essentially a repository that gets triggered when a new PR gets sub
 
 This allows us to perform github actions on libra without having admin access to the repo.
 
-![mirai bot](mirai-bot.png)
+![mirai bot](doc/images/mirai-bot.png)
 
 ## List of bots:
 
@@ -15,9 +15,15 @@ It only displays the full result to people added to the whitelist.
 
 **Clippy**. This runs [all the clippy rules](https://rust-lang.github.io/rust-clippy/master/) on a PR.
 
+![clippy](doc/images/clippy.png)
+
 **Wannabe-Land-Blocking**. This runs a set of selected clippy rule on a PR. These rules are ones we want to have as land blocking tests in CI, but cannot at the moment for various reasons.
 
+![wannabe](doc/images/wannabe.png)
+
 **Dephell**. Runs [cargo-dephell](https://github.com/mimoo/cargo-dephell) and create diffs for dependencies (from crates.io) on PRs from dependabots, uploads the artifacts to the github action itself.
+
+![dephell](doc/images/dephell.png)
 
 **Move-prover**. TKTK
 
