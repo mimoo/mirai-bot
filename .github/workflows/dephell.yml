@@ -102,6 +102,7 @@ jobs:
           # zip diffs
           mkdir diffs
           mv *.html diffs/
+          rm diffs/template.html # except template.tml
           zip -r diffs.zip diffs
 
       - name: upload diff-summary
